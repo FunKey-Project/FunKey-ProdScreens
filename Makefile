@@ -10,10 +10,10 @@ prodScreen_magnetTest.c \
 prodScreen_validation.c
 
 # Output
-EXEC=$(CROSS_COMPILE)funkey_prod_screens
+EXEC=funkey_prod_screens
 
 # Build settings
-CC=gcc
+CC=$(CROSS_COMPILE)gcc
 # SDL options
 CC_SDL=-lSDL -lSDL_image -lSDL_ttf `sdl-config --cflags --libs`
 # Other options
