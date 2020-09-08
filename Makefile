@@ -14,16 +14,20 @@ EXEC=funkey_prod_screens
 
 # Build settings
 CC=$(CROSS_COMPILE)gcc
-# SDL options
-CC_SDL=-lSDL -lSDL_image -lSDL_ttf `sdl-config --cflags --libs`
+
 # Other options
-CFLAGS=-O3 -std=c99 -Wall
+CFLAGS += `sdl-config --cflags`
+CFLAGS += -O3 -std=c99 -Wall
+
+# SDL options
+LIBS += `sdl-config --libs`
+LIBS += -lSDL_ttf -lSDL_image 
 
 
 all:Build
 
 Build:
-	$(CC) $(S_FILES) -o $(EXEC) $(CC_SDL) $(CFLAGS)
+	$(CC) $(S_FILES) -o $(EXEC) $(LIBS) $(CFLAGS)
 
 clean:
 	rm $(EXEC)
