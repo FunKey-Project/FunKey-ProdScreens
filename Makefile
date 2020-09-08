@@ -10,7 +10,7 @@ prodScreen_magnetTest.c \
 prodScreen_validation.c
 
 # Output
-EXEC=funkey_prod_screens
+EXEC=$(CROSS_COMPILE)funkey_prod_screens
 
 # Build settings
 CC=gcc
