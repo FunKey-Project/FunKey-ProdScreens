@@ -34,10 +34,11 @@
 #define Y_PADDING       10
 #define X_PADDING       20
 
-#define FONT_NAME_TITLE        "ProdResources/FreeSansBold.ttf"
-#define FONT_SIZE_TITLE        20
-#define FONT_NAME_INFO         FONT_NAME_TITLE
-#define FONT_SIZE_INFO         18
+#define FOLDER_RESSOURCES	  	"/usr/local/sbin/ProdResources"	
+#define FONT_NAME_TITLE        	FOLDER_RESSOURCES"/FreeSansBold.ttf"
+#define FONT_SIZE_TITLE        	20
+#define FONT_NAME_INFO         	FONT_NAME_TITLE
+#define FONT_SIZE_INFO         	18
 
 typedef struct 
 {

@@ -38,6 +38,9 @@ static int wait_event_loop(){
             }
         }
 
+        /* To inverstigate but with Buildroot, we need this: */
+        SDL_Flip(hw_surface);
+
         /* Sleep for some time */
         SDL_Delay(SLEEP_PERIOD_MS);
     }
@@ -98,7 +101,7 @@ int launch_prod_screen_speaker(){
     SDL_FreeSurface(text_surface);
 
     /* Render screen */
-    SDL_Flip(hw_surface);
+    //SDL_Flip(hw_surface);
 
     /// 
     int res = wait_event_loop();
