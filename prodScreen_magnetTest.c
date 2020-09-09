@@ -27,7 +27,7 @@ static int wait_event_loop(){
                     res = ERROR_MANUAL_FAIL;
                     break;
 
-                case SDLK_n:
+                //case SDLK_n:
                 case SDLK_ESCAPE:
                     stop_menu_loop = 1;
                     res = 0;
