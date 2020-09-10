@@ -1,11 +1,20 @@
 #include "funkey_prod_screens.h"
+#include <signal.h> 
 
+/* Static variable */
+static int stop_menu_loop = 0;
+
+/* Handler for SIGUSR1, caused by closing the console */
+void handle_sigusr1(int sig) 
+{ 
+    //printf("Caught signal USR1 %d\n", sig); 
+    stop_menu_loop = 1;
+}
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
 static int wait_event_loop(){
 
     SDL_Event event;
-    int stop_menu_loop = 0;
     int res = 0;
  
     /// -------- Main loop ---------
@@ -48,9 +57,12 @@ static int wait_event_loop(){
     return res;
 }
 
-int launch_prod_screen_magnet(){
+int launch_prod_screen_magnet(int argc, char *argv[]){
     SDL_Surface *text_surface = NULL;
     SDL_Rect text_pos;
+
+    /* Init Signals */
+    signal(SIGUSR1, handle_sigusr1); 
 
     /* Fill screen white */
     SDL_FillRect(hw_surface, NULL, SDL_MapRGB(hw_surface->format, bg_color.r, bg_color.g, bg_color.b));

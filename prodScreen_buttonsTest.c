@@ -1,4 +1,3 @@
-#include <SDL/SDL_image.h>
 #include "funkey_prod_screens.h"
 
 
@@ -15,7 +14,7 @@ static int keys_pushed[NB_KEYS] = {0};
 
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
-int launch_prod_screen_buttons(){
+int launch_prod_screen_buttons(int argc, char *argv[]){
 
     /* Declare Vars */
     SDL_Surface *text_surface = NULL;

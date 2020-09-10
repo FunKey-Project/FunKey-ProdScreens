@@ -2,7 +2,7 @@
 
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
-int launch_prod_screen_display(){
+int launch_prod_screen_display(int argc, char *argv[]){
     SDL_Event event;
     SDL_Surface *text_surface = NULL;
     SDL_Rect text_pos;

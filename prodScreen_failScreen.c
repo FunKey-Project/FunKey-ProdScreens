@@ -48,7 +48,7 @@ static int wait_event_loop(){
     return res;
 }
 
-int launch_prod_screen_fail(){
+int launch_prod_screen_fail(int argc, char *argv[]){
     SDL_Surface *text_surface = NULL;
     SDL_Rect text_pos;
 

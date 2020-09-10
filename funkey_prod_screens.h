@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
-//#include <SDL/SDL_image.h>
+#include <SDL/SDL_image.h>
 #include "prodScreen_failScreen.h"
 #include "prodScreen_waitBattery.h"
 #include "prodScreen_displayTest.h"
@@ -14,6 +14,7 @@
 #include "prodScreen_ledTest.h"
 #include "prodScreen_magnetTest.h"
 #include "prodScreen_validation.h"
+#include "prodScreen_showImage.h"
 
 
 /// Defines
@@ -40,10 +41,15 @@
 #define FONT_NAME_INFO         	FONT_NAME_TITLE
 #define FONT_SIZE_INFO         	18
 
+#define IMG_CONSOLE_LAYOUT          FOLDER_RESSOURCES"/funkey_with_buttons.png"
+#define IMG_BUTTON_LR_GREEN         FOLDER_RESSOURCES"/button_LR_green.png"
+#define IMG_BUTTON_NORMAL_GREEN     FOLDER_RESSOURCES"/button_round_green.png"
+
 typedef struct 
 {
     char *cmd_line_argument;
-    int (*ptr_function_launch_test)();
+    int (*ptr_function_launch_test)(int argc, char *argv[]);
+    int nb_args_needed;
 } s_prod_test;
 
 

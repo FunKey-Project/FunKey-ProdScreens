@@ -16,14 +16,15 @@ SDL_Color text_color = {COLOR_TEXT_R, COLOR_TEXT_G, COLOR_TEXT_B};
 
 /* Static Variables */
 static s_prod_test prod_tests[] = {
-    {"FAIL", launch_prod_screen_fail},
-    {"WAIT_BATTERY", launch_prod_screen_waitbattery},
-    {"DISPLAY", launch_prod_screen_display},
-    {"BUTTONS", launch_prod_screen_buttons},
-    {"SPEAKER", launch_prod_screen_speaker},
-    {"LED", launch_prod_screen_LED},
-    {"MAGNET", launch_prod_screen_magnet},
-    {"VALIDATE", launch_prod_screen_validation}
+    {"FAIL", launch_prod_screen_fail, 0},
+    {"WAIT_BATTERY", launch_prod_screen_waitbattery, 0},
+    {"DISPLAY", launch_prod_screen_display, 0},
+    {"BUTTONS", launch_prod_screen_buttons, 0},
+    {"SPEAKER", launch_prod_screen_speaker, 0},
+    {"LED", launch_prod_screen_LED, 0},
+    {"MAGNET", launch_prod_screen_magnet, 0},
+    {"VALIDATE", launch_prod_screen_validation, 0},
+    {"SHOW_IMAGE", launch_prod_screen_showImage, 1}
 };
 static int idx_current_prod_test = 0;
 
@@ -87,10 +88,16 @@ void deinit_libraries(){
 
 void usage(char *progname){
     int i;
-    fprintf(stderr, "Usage: %s [prod_test]\n\n", progname);
+    fprintf(stderr, "Usage: %s [prod_test] [optionnal: arg]\n\n", progname);
     fprintf(stderr, "\"prod_tests\" in:\n");
     for (i = 0; i < sizeof(prod_tests)/sizeof(prod_tests[0]); i++ ){
-        fprintf(stderr, "       %s\n", prod_tests[i].cmd_line_argument);
+        if(!prod_tests[i].nb_args_needed){
+            fprintf(stderr, "       %s\n", prod_tests[i].cmd_line_argument);
+        }
+        else{
+            fprintf(stderr, "       %s [needs %d additional args]\n", 
+                prod_tests[i].cmd_line_argument, prod_tests[i].nb_args_needed);   
+        }
     }
     exit(EXIT_FAILURE);
 }
@@ -98,37 +105,41 @@ void usage(char *progname){
 
 int main(int argc, char *argv[])
 {   
-    int optind, i;
+    int i;
     int res = ERROR_MANUAL_FAIL;
 
-    if(argc != 2){
+    if(argc < 2){
         usage(argv[0]);
     }
 
-    for (optind = 1; optind < argc; optind++) {
+    char * prod_test_str = argv[1];
+    int test_found = 0;
         
-        int test_found = 0;
-        
-        /* Check argument */
-        for (i = 0; i < sizeof(prod_tests)/sizeof(prod_tests[0]); i++ ){
-            if(!strcmp(prod_tests[i].cmd_line_argument, argv[optind])){
-                test_found = 1;
-                idx_current_prod_test = i;
-                break;
-            }
+    /* Check argument */
+    for (i = 0; i < sizeof(prod_tests)/sizeof(prod_tests[0]); i++ ){
+        if(!strcmp(prod_tests[i].cmd_line_argument, prod_test_str)){
+            test_found = 1;
+            idx_current_prod_test = i;
+            break;
         }
+    }
 
-        if(!test_found){
-            usage(argv[0]);
-        }
-           
-    }   
+    if(test_found && (prod_tests[i].nb_args_needed+2 != argc) ){
+        fprintf(stderr, "ERROR: %s needs %d additional args\n", 
+            prod_tests[idx_current_prod_test].cmd_line_argument, 
+            prod_tests[idx_current_prod_test].nb_args_needed);   
+        exit(EXIT_FAILURE);          
+    }
+
+    if(!test_found){
+        usage(argv[0]);
+    } 
 
     /// Init SDL
     init_libraries();
 
     /// Launch Program
-    res = prod_tests[idx_current_prod_test].ptr_function_launch_test();
+    res = prod_tests[idx_current_prod_test].ptr_function_launch_test(argc-2, &argv[2]);
 
     /// Deinit SDL
     deinit_libraries();
