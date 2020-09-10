@@ -2,7 +2,7 @@
 
 
 /// Defines
-#define TIMEOUT_FAIL            121 // in seconds
+#define TIMEOUT_FAIL            5 //121 // in seconds
 #define NB_KEYS                 13
 
 /// Static variables
@@ -10,6 +10,7 @@ static SDL_Surface *img_console_layout;
 static SDL_Surface *img_button_LR_green;
 static SDL_Surface *img_button_normal_green;
 static int keys[NB_KEYS] = {SDLK_m, SDLK_n, SDLK_l, SDLK_u, SDLK_r, SDLK_d, SDLK_b, SDLK_y, SDLK_x, SDLK_a, SDLK_s, SDLK_f, SDLK_q};
+static char *keys_str[NB_KEYS] = {"m (L1)", "n (R1)", "l (LEFT)", "u (UP)", "r (RIGHT)", "d (DOWN)", "b (B)", "y (Y)", "x (X)", "a (A)", "s (START)", "f (Fn)", "q (POWER ON/OFF)"};
 static int keys_pushed[NB_KEYS] = {0};
 
 
@@ -192,6 +193,13 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
         SDL_Delay(SLEEP_PERIOD_MS);
     }
 
+    /* Print not touched buttons if timeout */
+    printf("    Missing Keys: ");
+    for (i = 0; i < NB_KEYS; i++){
+        if(keys_pushed[i]) continue;
+        printf("%s,", keys_str[i]);
+    }
+    printf("\n");
 
     /*Free surfaces */
     SDL_FreeSurface(img_console_layout);
