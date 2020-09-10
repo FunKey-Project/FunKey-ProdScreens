@@ -2,7 +2,7 @@
 
 
 /// Defines
-#define TIMEOUT_FAIL            5 //121 // in seconds
+#define time_left_FAIL            101 // in seconds
 #define NB_KEYS                 13
 
 /// Static variables
@@ -24,7 +24,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
     int stop_menu_loop = 0;
     int res = 2; // 2=FAIL
     int render = 0;
-    int timeout = TIMEOUT_FAIL;
+    int time_left = time_left_FAIL;
     int prev_ms = 0;
     int i;
     char str_title_buttons[50];
@@ -48,13 +48,13 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
     }
 
     /*  Main loop */
-    while (!stop_menu_loop && timeout)
+    while (!stop_menu_loop && time_left)
     {
         if(SDL_GetTicks() - prev_ms > 1000){
 
             /* Update time*/
             prev_ms = SDL_GetTicks();
-            timeout--;
+            time_left--;
             
             /* Fill screen white */
             SDL_FillRect(hw_surface, NULL, SDL_MapRGB(hw_surface->format, bg_color.r, bg_color.g, bg_color.b));
@@ -70,7 +70,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
             SDL_FreeSurface(text_surface);
 
             /* Write "Screen ok ? */
-            sprintf(str_title_buttons, "Press all buttons...%ds", timeout);
+            sprintf(str_title_buttons, "Press all buttons...%ds", time_left);
             text_surface = TTF_RenderText_Shaded(font_info, str_title_buttons, text_color, bg_color);
             text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
             text_pos.y = 2*Y_PADDING + text_surface->h/2;
@@ -169,7 +169,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
                     keys_pushed[i] = 1;
                 }
 
-                /* All keys pushe = exit with success */
+                /* All keys pushed = exit with success */
                 if(nb_keys_pushed == NB_KEYS){
                     stop_menu_loop = 1;
                     res = 0;
@@ -193,13 +193,17 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
         SDL_Delay(SLEEP_PERIOD_MS);
     }
 
-    /* Print not touched buttons if timeout */
-    printf("    Missing Keys: ");
-    for (i = 0; i < NB_KEYS; i++){
-        if(keys_pushed[i]) continue;
-        printf("%s,", keys_str[i]);
+    /* Print not touched buttons if time_left */
+    if(!time_left){
+        res = 2;
+
+        printf("    Missing Keys: ");
+        for (i = 0; i < NB_KEYS; i++){
+            if(keys_pushed[i]) continue;
+            printf("%s,", keys_str[i]);
+        }
+        printf("\n");
     }
-    printf("\n");
 
     /*Free surfaces */
     SDL_FreeSurface(img_console_layout);
