@@ -10,7 +10,7 @@
 static int is_battery_present(){
     char buf[10];
     FILE *fp;
-    int res = EXIT_FAILURE;
+    int res = 0;
 
     /* Read battery file */
     if ((fp = fopen(BATTERY_PRESENT_FILE, "r")) == NULL) {
@@ -34,7 +34,7 @@ static int wait_event_loop(){
     SDL_Event event;
     int stop_menu_loop = 0;
     int prev_ms = 0;
-    int res = ERROR_MANUAL_FAIL;
+    int res = EXIT_FAILURE;
  
     /// -------- Main loop ---------
     while (!stop_menu_loop)
