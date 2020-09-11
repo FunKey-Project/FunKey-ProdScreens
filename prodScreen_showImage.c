@@ -20,13 +20,16 @@ void flip_NNOptimized_AllowOutOfScreen(SDL_Surface *src_surface, SDL_Surface *ds
   int i, j;
 
   /* Compute padding for centering when out of bounds */
-  int y_padding = (SCREEN_VERTICAL_SIZE-new_h)/2;
-  int x_padding = 0;
+  int x_padding = 0, y_padding = 0;
+  if(h2>SCREEN_HORIZONTAL_SIZE){
+     y_padding = (SCREEN_VERTICAL_SIZE-new_h)/2;
+  }
   if(w2>SCREEN_HORIZONTAL_SIZE){
     x_padding = (w2-SCREEN_HORIZONTAL_SIZE)/2 + 1;
   }
   int x_padding_ratio = x_padding*w1/w2;
 
+  /* Copy pixels NN */
   for (i=0;i<h2;i++) 
   {
     if(i>=SCREEN_VERTICAL_SIZE){
@@ -52,6 +55,8 @@ void flip_NNOptimized_AllowOutOfScreen(SDL_Surface *src_surface, SDL_Surface *ds
 
 int launch_prod_screen_showImage(int argc, char *argv[]){
     SDL_Event event;
+    SDL_Surface *text_surface = NULL;
+    SDL_Rect text_pos;
     int res = 0;
     int stop_menu_loop = 0;
 
@@ -64,14 +69,54 @@ int launch_prod_screen_showImage(int argc, char *argv[]){
         exit(1);
     }
 
+    /* Fill screen white */
+    SDL_FillRect(hw_surface, NULL, SDL_MapRGB(hw_surface->format, bg_color.r, bg_color.g, bg_color.b));
+
+    /* Write Title */
+    text_surface = TTF_RenderText_Shaded(font_info, "SCAN & PRINT", text_color, bg_color);
+    int height_title = text_surface->h;
+    text_pos.x = hw_surface->w/2 - text_surface->w/2;
+    text_pos.y = 0;
+    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
+    SDL_FreeSurface(text_surface);
+
+    /* Write:
+        "L=FAIL"
+    */
+    SDL_Color red_color={220,20,20};
+    text_surface = TTF_RenderText_Shaded(font_info, "L=FAIL", red_color, bg_color);
+    int height_buttons = text_surface->h;
+    text_pos.x = X_PADDING;
+    text_pos.y = hw_surface->h  - text_surface->h;
+    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
+    SDL_FreeSurface(text_surface);
+
+    /* Write:
+        "R=OK"
+    */
+    SDL_Color green_color={20,220,20};
+    text_surface = TTF_RenderText_Shaded(font_info, "R=DONE", green_color, bg_color);
+    text_pos.x = hw_surface->w - text_surface->w - X_PADDING;
+    text_pos.y = hw_surface->h  - text_surface->h;
+    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
+    SDL_FreeSurface(text_surface);
 
     /* Convert img to RGB565 */
     SDL_Surface *image_rgb565 = SDL_CreateRGBSurface(SDL_SWSURFACE, image->w, image->h, 16, 0, 0, 0, 0);
     SDL_BlitSurface(image, NULL, image_rgb565, NULL);
     SDL_FreeSurface(image);
+
+    /* Resize img */
+    int new_img_height = hw_surface->h - height_buttons - height_title;
+    int new_img_width = image->w *new_img_height / image->h;
+    SDL_Surface *image_rgb565_resized = SDL_CreateRGBSurface(SDL_SWSURFACE, new_img_width, new_img_height, 16, 0, 0, 0, 0);
+    flip_NNOptimized_AllowOutOfScreen(image_rgb565, image_rgb565_resized, image_rgb565_resized->w, image_rgb565_resized->h);
+    SDL_FreeSurface(image_rgb565);
     
-    /* Scale to fullscreen */
-    flip_NNOptimized_AllowOutOfScreen(image_rgb565, hw_surface, hw_surface->w, hw_surface->h);
+    /* Blit image */
+    SDL_Rect pos_img = {(hw_surface->w-image_rgb565_resized->w)/2, height_title, image_rgb565_resized->w, image_rgb565_resized->h};
+    SDL_BlitSurface(image_rgb565_resized, NULL, hw_surface, &pos_img);
+    SDL_FreeSurface(image_rgb565_resized);
 
     /// -------- Main loop ---------
     while (!stop_menu_loop)
@@ -86,10 +131,17 @@ int launch_prod_screen_showImage(int argc, char *argv[]){
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
+                case SDLK_m:
+                    stop_menu_loop = 1;
+                    res = ERROR_MANUAL_FAIL;
+                    break;
+
+                case SDLK_n:
                 case SDLK_ESCAPE:
                     stop_menu_loop = 1;
                     res = 0;
                     break;
+
                 default:
                     break;
             }

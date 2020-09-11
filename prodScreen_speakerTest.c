@@ -60,6 +60,7 @@ int launch_prod_screen_speaker(int argc, char *argv[]){
     text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
     text_pos.y = Y_PADDING;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
+    SDL_FreeSurface(text_surface);
 
     /* Write "SPEAKER ok ? */
     text_surface = TTF_RenderText_Shaded(font_title, "SPEAKER OK ?", text_color, bg_color);
