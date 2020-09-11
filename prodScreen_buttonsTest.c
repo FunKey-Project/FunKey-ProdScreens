@@ -22,7 +22,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
     SDL_Rect text_pos;
     SDL_Event event;
     int stop_menu_loop = 0;
-    int res = 2; // 2=FAIL
+    int res = EXIT_FAILURE;
     int render = 0;
     int time_left = time_left_FAIL;
     int prev_ms = 0;
@@ -195,7 +195,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
 
     /* Print not touched buttons if time_left */
     if(!time_left){
-        res = 2;
+        res = ERROR_MANUAL_FAIL;
 
         printf("    Missing Keys: ");
         for (i = 0; i < NB_KEYS; i++){

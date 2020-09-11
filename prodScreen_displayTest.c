@@ -9,7 +9,7 @@ int launch_prod_screen_display(int argc, char *argv[]){
     int stop_menu_loop = 0;
     int timeout = 31;
     int prev_ms = 0;
-    int res = ERROR_MANUAL_FAIL;
+    int res = EXIT_FAILURE;
 
     /*  Main loop */
     while (!stop_menu_loop && timeout)

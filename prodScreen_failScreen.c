@@ -6,7 +6,7 @@ static int wait_event_loop(){
 
     SDL_Event event;
     int stop_menu_loop = 0;
-    int res = 0;
+    int res = EXIT_FAILURE;
  
     /// -------- Main loop ---------
     while (!stop_menu_loop)

@@ -10,7 +10,7 @@
 static int is_battery_present(){
     char buf[10];
     FILE *fp;
-    int res = 0;
+    int res = EXIT_FAILURE;
 
     /* Read battery file */
     if ((fp = fopen(BATTERY_PRESENT_FILE, "r")) == NULL) {
