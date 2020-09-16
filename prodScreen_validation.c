@@ -53,7 +53,7 @@ int launch_prod_screen_validation(int argc, char *argv[]){
     SDL_Rect text_pos;
 
     /* Fill screen white */
-    SDL_FillRect(hw_surface, NULL, SDL_MapRGB(hw_surface->format, bg_color.r, bg_color.g, bg_color.b));
+    SDL_FillRect(hw_surface, NULL, SDL_MapRGBA(hw_surface->format, bg_color.r, bg_color.g, bg_color.b, 0) );
 
     /* Write Title */
     text_surface = TTF_RenderText_Shaded(font_title, "FUNKEY PCBA TESTS", text_color, bg_color);

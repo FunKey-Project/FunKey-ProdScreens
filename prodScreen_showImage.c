@@ -8,49 +8,67 @@
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
 
-/* Nearest neighboor optimized with possible out of screen coordinates (for cropping) */
-void flip_NNOptimized_AllowOutOfScreen(SDL_Surface *src_surface, SDL_Surface *dst_surface, int new_w, int new_h){
-  int w1=src_surface->w;
-  //int h1=src_surface->h;
-  int w2=new_w;
-  int h2=new_h;
-  int x_ratio = (int)((src_surface->w<<16)/w2);
-  int y_ratio = (int)((src_surface->h<<16)/h2);
+/// Nearest neighboor optimized with possible out of screen coordinates (for cropping)
+SDL_Surface * zoomSurface(SDL_Surface *src_surface, int dst_width, int dst_height){
+
+  /* Declare vars */
+  int x_ratio;
+  int y_ratio;
   int x2, y2;
   int i, j;
+  int rat;
 
-  /* Compute padding for centering when out of bounds */
-  int x_padding = 0, y_padding = 0;
-  if(h2>SCREEN_HORIZONTAL_SIZE){
-     y_padding = (SCREEN_VERTICAL_SIZE-new_h)/2;
+  /* Sanity checks */
+  if(src_surface == NULL){
+    printf("ERROR in %s, sanity check\n", __func__);
+    return NULL;
   }
-  if(w2>SCREEN_HORIZONTAL_SIZE){
-    x_padding = (w2-SCREEN_HORIZONTAL_SIZE)/2 + 1;
-  }
-  int x_padding_ratio = x_padding*w1/w2;
 
-  /* Copy pixels NN */
-  for (i=0;i<h2;i++) 
+  /* Compute zoom ratio */
+  x_ratio = (int)((src_surface->w << 16) / dst_width);
+  y_ratio = (int)((src_surface->h << 16) / dst_height);
+
+  /* Create dst surface */
+  SDL_Surface *dst_surface = SDL_CreateRGBSurface(src_surface->flags,
+      dst_width, dst_height,
+      src_surface->format->BitsPerPixel,
+      src_surface->format->Rmask, src_surface->format->Gmask,
+      src_surface->format->Bmask, src_surface->format->Amask);
+  if(dst_surface == NULL){
+    printf("ERROR in %s, cannot create dst_surface: %s\n", __func__, SDL_GetError());
+  }
+
+  /* Columns iterations */
+  for (i = 0; i < dst_surface->h; i++)
   {
-    if(i>=SCREEN_VERTICAL_SIZE){
-      continue;
-    }
 
-    uint16_t* t = (uint16_t*)(dst_surface->pixels+((i+y_padding)* ((w2>SCREEN_HORIZONTAL_SIZE)?SCREEN_HORIZONTAL_SIZE:w2) )*sizeof(uint16_t));
+    /* Get current lines in src and dst surfaces */
+    uint8_t* t = ( (uint8_t*) dst_surface->pixels + (i*dst_surface->w)*dst_surface->format->BytesPerPixel );
     y2 = ((i*y_ratio)>>16);
-    uint16_t* p = (uint16_t*)(src_surface->pixels + (y2*w1 + x_padding_ratio) *sizeof(uint16_t));
-    int rat = 0;
-    for (j=0;j<w2;j++) 
+    uint8_t* p = ( (uint8_t*) src_surface->pixels + (y2*src_surface->w)*src_surface->format->BytesPerPixel );
+    rat =  0;
+
+    /* Lines iterations */
+    for (j = 0; j < dst_surface->w; j++)
     {
-      if(j>=SCREEN_HORIZONTAL_SIZE){
-        continue;
-      }
+
+      /* Get current pixel in src surface */
       x2 = (rat>>16);
-      *t++ = p[x2];
+
+      /* Copy src pixel in dst surface */
+      memcpy(t, p+x2*src_surface->format->BytesPerPixel, dst_surface->format->BytesPerPixel);
+      t += dst_surface->format->BytesPerPixel;
+
+      /* Update x position in source surface */
       rat += x_ratio;
-    } 
+    }
   }
+
+  /* Return new zoomed surface */
+  return dst_surface;
 }
+
+
 
 
 int launch_prod_screen_showImage(int argc, char *argv[]){
@@ -60,17 +78,8 @@ int launch_prod_screen_showImage(int argc, char *argv[]){
     int res = EXIT_FAILURE;
     int stop_menu_loop = 0;
 
-    /* Load Img */
-    char *img_path = argv[0];
-    SDL_Surface *image=IMG_Load(img_path);
-    if(!image) {
-        printf("ERROR IMG_Load: %s\n", IMG_GetError());
-        printf("IMG path is: %s\n", img_path);
-        exit(1);
-    }
-
     /* Fill screen white */
-    SDL_FillRect(hw_surface, NULL, SDL_MapRGB(hw_surface->format, bg_color.r, bg_color.g, bg_color.b));
+    SDL_FillRect(hw_surface, NULL, SDL_MapRGBA(hw_surface->format, bg_color.r, bg_color.g, bg_color.b, 0) );
 
     /* Write Title */
     text_surface = TTF_RenderText_Shaded(font_info, "SCAN & PRINT", text_color, bg_color);
@@ -101,22 +110,34 @@ int launch_prod_screen_showImage(int argc, char *argv[]){
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 
-    /* Convert img to RGB565 */
-    SDL_Surface *image_rgb565 = SDL_CreateRGBSurface(SDL_SWSURFACE, image->w, image->h, 16, 0, 0, 0, 0);
-    SDL_BlitSurface(image, NULL, image_rgb565, NULL);
+    /* Load Img */
+    char *img_path = argv[0];
+    SDL_Surface *image=IMG_Load(img_path);
+    if(!image) {
+        printf("ERROR IMG_Load: %s\n", IMG_GetError());
+        printf("IMG path is: %s\n", img_path);
+        exit(1);
+    }
+    SDL_SetAlpha( image, 0, SDL_ALPHA_OPAQUE );
+
+    /* Convert to RGBA 32bits*/
+    SDL_Surface *image_rgb_RGBA32b = SDL_CreateRGBSurface(SDL_SWSURFACE, image->w, image->h, 32, 
+      image->format->Rmask, image->format->Gmask,
+      image->format->Bmask, image->format->Amask);
+    SDL_BlitSurface(image, NULL, image_rgb_RGBA32b, NULL);
     SDL_FreeSurface(image);
 
-    /* Resize img */
+    /* Resize image */
     int new_img_height = hw_surface->h - height_buttons - height_title;
     int new_img_width = image->w *new_img_height / image->h;
-    SDL_Surface *image_rgb565_resized = SDL_CreateRGBSurface(SDL_SWSURFACE, new_img_width, new_img_height, 16, 0, 0, 0, 0);
-    flip_NNOptimized_AllowOutOfScreen(image_rgb565, image_rgb565_resized, image_rgb565_resized->w, image_rgb565_resized->h);
-    SDL_FreeSurface(image_rgb565);
+    SDL_Surface *image_RGBA32b_resized = zoomSurface(image_rgb_RGBA32b, new_img_width, new_img_height);
+    //SDL_SaveBMP(image_RGBA32b_resized,"./image_RGBA32b_resized.bmp");
+    SDL_FreeSurface(image_rgb_RGBA32b);
     
     /* Blit image */
-    SDL_Rect pos_img = {(hw_surface->w-image_rgb565_resized->w)/2, height_title, image_rgb565_resized->w, image_rgb565_resized->h};
-    SDL_BlitSurface(image_rgb565_resized, NULL, hw_surface, &pos_img);
-    SDL_FreeSurface(image_rgb565_resized);
+    SDL_Rect pos_img = {(hw_surface->w-image_RGBA32b_resized->w)/2, height_title, image_RGBA32b_resized->w, image_RGBA32b_resized->h};
+    SDL_BlitSurface(image_RGBA32b_resized, NULL, hw_surface, &pos_img);
+    SDL_FreeSurface(image_RGBA32b_resized);
 
     /// -------- Main loop ---------
     while (!stop_menu_loop)

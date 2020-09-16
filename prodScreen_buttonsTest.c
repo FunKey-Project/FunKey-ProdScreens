@@ -57,7 +57,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
             time_left--;
             
             /* Fill screen white */
-            SDL_FillRect(hw_surface, NULL, SDL_MapRGB(hw_surface->format, bg_color.r, bg_color.g, bg_color.b));
+            SDL_FillRect(hw_surface, NULL, SDL_MapRGBA(hw_surface->format, bg_color.r, bg_color.g, bg_color.b, 0) );
 
             /* Background image */
             SDL_BlitSurface(img_console_layout, NULL, hw_surface, NULL);

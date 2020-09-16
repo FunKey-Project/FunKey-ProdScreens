@@ -65,7 +65,7 @@ int launch_prod_screen_magnet(int argc, char *argv[]){
     signal(SIGUSR1, handle_sigusr1); 
 
     /* Fill screen white */
-    SDL_FillRect(hw_surface, NULL, SDL_MapRGB(hw_surface->format, bg_color.r, bg_color.g, bg_color.b));
+    SDL_FillRect(hw_surface, NULL, SDL_MapRGBA(hw_surface->format, bg_color.r, bg_color.g, bg_color.b, 0) );
 
     /* Write Title */
     text_surface = TTF_RenderText_Shaded(font_title, "FunKey PCBA Tests", text_color, bg_color);

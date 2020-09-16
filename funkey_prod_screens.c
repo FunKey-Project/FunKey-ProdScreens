@@ -64,7 +64,7 @@ void init_libraries(){
     
     /// Open HW screen and set video mode 240x240
     hw_surface = SDL_SetVideoMode(SCREEN_HORIZONTAL_SIZE, SCREEN_VERTICAL_SIZE, 
-                        16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+                        32, SDL_HWSURFACE | SDL_DOUBLEBUF);
     if (hw_surface == NULL)
     {
         fprintf(stderr, "ERROR SDL_SetVideoMode: %s\n", SDL_GetError());
