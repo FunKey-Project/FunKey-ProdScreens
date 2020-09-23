@@ -9,6 +9,7 @@
 #include "prodScreen_failScreen.h"
 #include "prodScreen_waitBattery.h"
 #include "prodScreen_displayTest.h"
+#include "prodScreen_brightnessTest.h"
 #include "prodScreen_buttonsTest.h"
 #include "prodScreen_speakerTest.h"
 #include "prodScreen_ledTest.h"

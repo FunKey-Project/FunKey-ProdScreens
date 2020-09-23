@@ -3,6 +3,7 @@ S_FILES=funkey_prod_screens.c \
 prodScreen_failScreen.c \
 prodScreen_waitBattery.c \
 prodScreen_displayTest.c \
+prodScreen_brightnessTest.c \
 prodScreen_buttonsTest.c \
 prodScreen_speakerTest.c \
 prodScreen_ledTest.c \

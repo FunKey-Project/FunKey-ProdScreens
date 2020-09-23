@@ -19,6 +19,7 @@ static s_prod_test prod_tests[] = {
     {"FAIL", launch_prod_screen_fail, 0},
     {"WAIT_BATTERY", launch_prod_screen_waitbattery, 0},
     {"DISPLAY", launch_prod_screen_display, 0},
+    {"BRIGHTNESS", launch_prod_screen_brightness, 0},
     {"BUTTONS", launch_prod_screen_buttons, 0},
     {"SPEAKER", launch_prod_screen_speaker, 0},
     {"LED", launch_prod_screen_LED, 0},
