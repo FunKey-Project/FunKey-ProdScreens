@@ -13,6 +13,7 @@ TTF_Font *font_title = NULL;
 TTF_Font *font_info = NULL;
 SDL_Color bg_color = {COLOR_BG_R, COLOR_BG_G, COLOR_BG_B};
 SDL_Color text_color = {COLOR_TEXT_R, COLOR_TEXT_G, COLOR_TEXT_B};
+char *prog_title = "FUNKEY S TESTS";
 
 /* Static Variables */
 static s_prod_test prod_tests[] = {

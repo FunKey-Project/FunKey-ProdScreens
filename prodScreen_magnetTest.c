@@ -68,16 +68,25 @@ int launch_prod_screen_magnet(int argc, char *argv[]){
     SDL_FillRect(hw_surface, NULL, SDL_MapRGBA(hw_surface->format, bg_color.r, bg_color.g, bg_color.b, 0) );
 
     /* Write Title */
-    text_surface = TTF_RenderText_Shaded(font_title, "FunKey PCBA Tests", text_color, bg_color);
+    text_surface = TTF_RenderText_Shaded(font_title, prog_title, text_color, bg_color);
     text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
     text_pos.y = Y_PADDING;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 
-    /* Write "Screen ok ? */
+    /* Write 
+    "   MAGNET TEST 
+    (close the console)*/
+    int y_pad_tmp = 11;
     text_surface = TTF_RenderText_Shaded(font_title, "MAGNET TEST", text_color, bg_color);
     text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-    text_pos.y = SCREEN_VERTICAL_SIZE/2 - text_surface->h/2;
+    text_pos.y = SCREEN_VERTICAL_SIZE/2 - text_surface->h/2 - y_pad_tmp;
+    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
+    SDL_FreeSurface(text_surface);
+    
+    text_surface = TTF_RenderText_Shaded(font_title, "(close the console)", text_color, bg_color);
+    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
+    text_pos.y = SCREEN_VERTICAL_SIZE/2 - text_surface->h/2 + y_pad_tmp;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 

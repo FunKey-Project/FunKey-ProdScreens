@@ -63,7 +63,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
             SDL_BlitSurface(img_console_layout, NULL, hw_surface, NULL);
 
             /* Write Title */
-            text_surface = TTF_RenderText_Shaded(font_title, "FunKey PCBA Tests", text_color, bg_color);
+            text_surface = TTF_RenderText_Shaded(font_title, prog_title, text_color, bg_color);
             text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
             text_pos.y = Y_PADDING;
             SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);

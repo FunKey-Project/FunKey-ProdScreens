@@ -57,7 +57,7 @@ int launch_prod_screen_fail(int argc, char *argv[]){
 
     /* Write Title */
     SDL_Color red={255,0,0};
-    text_surface = TTF_RenderText_Shaded(font_title, "FUNKEY PCBA TESTS", red, bg_color);
+    text_surface = TTF_RenderText_Shaded(font_title, prog_title, red, bg_color);
     text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
     text_pos.y = Y_PADDING;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
