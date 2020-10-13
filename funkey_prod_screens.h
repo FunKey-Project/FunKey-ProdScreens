@@ -16,6 +16,7 @@
 #include "prodScreen_magnetTest.h"
 #include "prodScreen_validation.h"
 #include "prodScreen_showImage.h"
+#include "prodScreen_gamma.h"
 
 
 /// Defines
@@ -41,10 +42,6 @@
 #define FONT_SIZE_TITLE        	20
 #define FONT_NAME_INFO         	FONT_NAME_TITLE
 #define FONT_SIZE_INFO         	18
-
-#define IMG_CONSOLE_LAYOUT          FOLDER_RESSOURCES"/funkey_with_buttons.png"
-#define IMG_BUTTON_LR_GREEN         FOLDER_RESSOURCES"/button_LR_green.png"
-#define IMG_BUTTON_NORMAL_GREEN     FOLDER_RESSOURCES"/button_round_green.png"
 
 typedef struct 
 {

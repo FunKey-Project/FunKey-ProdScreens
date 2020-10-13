@@ -9,7 +9,8 @@ prodScreen_speakerTest.c \
 prodScreen_ledTest.c \
 prodScreen_magnetTest.c \
 prodScreen_validation.c \
-prodScreen_showImage.c
+prodScreen_showImage.c \
+prodScreen_gamma.c
 
 # Output
 EXEC=funkey_prod_screens
