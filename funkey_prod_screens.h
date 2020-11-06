@@ -17,7 +17,6 @@
 #include "prodScreen_validation.h"
 #include "prodScreen_showImage.h"
 #include "prodScreen_gamma.h"
-#include "prodScreen_tearingTest.h"
 
 
 /// Defines
