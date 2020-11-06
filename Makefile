@@ -10,6 +10,7 @@ prodScreen_ledTest.c \
 prodScreen_magnetTest.c \
 prodScreen_validation.c \
 prodScreen_showImage.c \
+prodScreen_tearingTest.c \
 prodScreen_gamma.c
 
 # Output

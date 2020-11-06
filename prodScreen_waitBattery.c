@@ -66,7 +66,7 @@ static int wait_event_loop(){
             }
         }
 
-        /* To inverstigate but with Buildroot, we need this: */
+        /* To investigate but with Buildroot, we need this: */
         SDL_Flip(hw_surface);
 
         if(SDL_GetTicks() - prev_ms > CHECK_BATTERY_DELAY_MS){

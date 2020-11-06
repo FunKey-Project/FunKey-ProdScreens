@@ -27,7 +27,8 @@ static s_prod_test prod_tests[] = {
     {"MAGNET", launch_prod_screen_magnet, 0},
     {"VALIDATE", launch_prod_screen_validation, 0},
     {"SHOW_IMAGE", launch_prod_screen_showImage, 1},
-    {"GAMMA", launch_prod_screen_gamma, 0}
+    {"GAMMA", launch_prod_screen_gamma, 0},
+    {"TEARING", launch_prod_screen_tearingtest, 0}
 };
 static int idx_current_prod_test = 0;
 
