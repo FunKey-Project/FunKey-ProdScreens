@@ -17,6 +17,7 @@
 #include "prodScreen_validation.h"
 #include "prodScreen_showImage.h"
 #include "prodScreen_gamma.h"
+#include "prodScreen_tearingTest.h"
 
 
 /// Defines
@@ -37,7 +38,7 @@
 #define Y_PADDING       10
 #define X_PADDING       20
 
-#define FOLDER_RESSOURCES	  	"/usr/local/sbin/ProdResources"	
+#define FOLDER_RESSOURCES	  	"/usr/local/share/ProdResources"	
 #define FONT_NAME_TITLE        	FOLDER_RESSOURCES"/FreeSansBold.ttf"
 #define FONT_SIZE_TITLE        	20
 #define FONT_NAME_INFO         	FONT_NAME_TITLE
@@ -48,6 +49,7 @@ typedef struct
     char *cmd_line_argument;
     int (*ptr_function_launch_test)(int argc, char *argv[]);
     int nb_args_needed;
+    const char *args_description;
 } s_prod_test;
 
 

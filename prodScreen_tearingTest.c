@@ -8,12 +8,13 @@
 static int bright = 0;
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
-static int wait_event_loop(){
+static int wait_event_loop(uint32_t fps){
 
     SDL_Event event;
     int stop_menu_loop = 0;
-    int prev_ms = 0;
     int res = EXIT_FAILURE;
+    uint32_t prev_ms = SDL_GetTicks();
+    uint32_t cur_ms = SDL_GetTicks();
  
     /// -------- Main loop ---------
     while (!stop_menu_loop)
@@ -53,11 +54,17 @@ static int wait_event_loop(){
             current_color.r, current_color.g, current_color.b, 0) );
         bright = 1-bright;
 
-        /* To investigate but with Buildroot, we need this: */
+        /* Flip screen */
         SDL_Flip(hw_surface);
 
-        /* Sleep for some time */
-        //SDL_Delay(SLEEP_PERIOD_MS);
+        /* Handle FPS */
+        if(fps){
+            cur_ms = SDL_GetTicks();
+            if(cur_ms-prev_ms < 1000/fps){
+                SDL_Delay(1000/fps - (cur_ms-prev_ms));
+            }
+            prev_ms = SDL_GetTicks();
+        }
     }
 
     return res;
@@ -67,7 +74,19 @@ int launch_prod_screen_tearingtest(int argc, char *argv[]){
     SDL_Surface *text_surface = NULL;
     SDL_Rect text_pos;
 
+    int fps = 0; // non stop
+    if(argc > 0 && argv[0] != NULL){
+        fps = atoi(argv[0]);
+        if(!fps){
+            printf("Cannot convert %s to int\n", argv[0]);
+            return EXIT_FAILURE;
+        }
+    }
+
+    printf("fps = %d, argv[0] = %s\n", fps, argv[0]);
+
     /// Main loop
-    int res = wait_event_loop();
+    int res = wait_event_loop(fps);
+
     return res;
 }
