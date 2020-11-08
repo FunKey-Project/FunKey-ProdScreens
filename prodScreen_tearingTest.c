@@ -6,6 +6,7 @@
 #include "funkey_prod_screens.h"
 
 static int bright = 0;
+FILE *fptr;
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
 static int wait_event_loop(uint32_t fps){
@@ -55,6 +56,7 @@ static int wait_event_loop(uint32_t fps){
         bright = 1-bright;
 
         /* Flip screen */
+        //system("echo 1 > /sys/class/graphics/fb0/switch_backbuf");
         SDL_Flip(hw_surface);
 
         /* Handle FPS */
@@ -82,8 +84,7 @@ int launch_prod_screen_tearingtest(int argc, char *argv[]){
             return EXIT_FAILURE;
         }
     }
-
-    printf("fps = %d, argv[0] = %s\n", fps, argv[0]);
+    //printf("fps = %d, argv[0] = %s\n", fps, argv[0]);
 
     /// Main loop
     int res = wait_event_loop(fps);

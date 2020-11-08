@@ -67,7 +67,7 @@ void init_libraries(){
 
     /// Open HW screen and set video mode 240x240
     hw_surface = SDL_SetVideoMode(SCREEN_HORIZONTAL_SIZE, SCREEN_VERTICAL_SIZE, 
-                        32, SDL_HWSURFACE | SDL_DOUBLEBUF);
+                        32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
     /*hw_surface = SDL_SetVideoMode(SCREEN_HORIZONTAL_SIZE, SCREEN_VERTICAL_SIZE, 
                         32, SDL_HWSURFACE);*/
     if (hw_surface == NULL)
