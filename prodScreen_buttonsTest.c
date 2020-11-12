@@ -9,8 +9,8 @@
 static SDL_Surface *img_console_layout;
 static SDL_Surface *img_button_LR_green;
 static SDL_Surface *img_button_normal_green;
-static int keys[NB_KEYS] = {SDLK_m, SDLK_n, SDLK_l, SDLK_u, SDLK_r, SDLK_d, SDLK_b, SDLK_y, SDLK_x, SDLK_a, SDLK_s, SDLK_f, SDLK_q};
-static char *keys_str[NB_KEYS] = {"m (L1)", "n (R1)", "l (LEFT)", "u (UP)", "r (RIGHT)", "d (DOWN)", "b (B)", "y (Y)", "x (X)", "a (A)", "s (START)", "f (Fn)", "q (POWER ON/OFF)"};
+static int keys[NB_KEYS] = {SDLK_m, SDLK_n, SDLK_l, SDLK_u, SDLK_r, SDLK_d, SDLK_b, SDLK_y, SDLK_x, SDLK_a, SDLK_s, SDLK_k, SDLK_q};
+static char *keys_str[NB_KEYS] = {"m (L1)", "n (R1)", "l (LEFT)", "u (UP)", "r (RIGHT)", "d (DOWN)", "b (B)", "y (Y)", "x (X)", "a (A)", "s (START)", "k (Select)", "q (POWER ON/OFF)"};
 static int keys_pushed[NB_KEYS] = {0};
 
 
