@@ -59,7 +59,7 @@ extern TTF_Font *font_title;
 extern TTF_Font *font_info;
 extern SDL_Color bg_color;
 extern SDL_Color text_color;
-char *prog_title;
+extern char *prog_title;
 
 
 #endif //__FUNKEY_PROD_SCREENS__
