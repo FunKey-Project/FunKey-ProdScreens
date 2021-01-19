@@ -1,21 +1,36 @@
 #include "funkey_prod_screens.h"
 #include <signal.h> 
 
+#define SHELL_CMD_RECORD_PID                "record_pid"
+#define SHELL_CMD_CANCEL_SCHED_POWERDOWN    "cancel_sched_powerdown"
+
 /* Static variable */
 static int stop_menu_loop = 0;
+static int res = EXIT_FAILURE;
 
 /* Handler for SIGUSR1, caused by closing the console */
 void handle_sigusr1(int sig) 
 { 
+
+    /* Send command to cancel any previously scheduled powerdown */
+    if (popen(SHELL_CMD_CANCEL_SCHED_POWERDOWN, "r") == NULL)
+    {
+        /* Countdown is still ticking, so better do nothing
+           than start writing and get interrupted!
+        */
+        printf("Failed to cancel scheduled shutdown\n");
+        //exit(0);
+    }
+
     //printf("Caught signal USR1 %d\n", sig); 
     stop_menu_loop = 1;
+    res = 0;
 }
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
 static int wait_event_loop(){
 
     SDL_Event event;
-    int res = EXIT_FAILURE;
  
     /// -------- Main loop ---------
     while (!stop_menu_loop)
@@ -60,6 +75,11 @@ static int wait_event_loop(){
 int launch_prod_screen_magnet(int argc, char *argv[]){
     SDL_Surface *text_surface = NULL;
     SDL_Rect text_pos;
+
+    /* Record current PID */
+    char shell_cmd[100];
+    sprintf(shell_cmd, "%s %d", SHELL_CMD_RECORD_PID, getpid());
+    system(shell_cmd);
 
     /* Init Signals */
     signal(SIGUSR1, handle_sigusr1); 
