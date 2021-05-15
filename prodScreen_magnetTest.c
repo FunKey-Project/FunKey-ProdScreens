@@ -1,7 +1,7 @@
 #include "funkey_prod_screens.h"
 #include <signal.h> 
 
-#define SHELL_CMD_RECORD_PID                "record_pid"
+#define SHELL_CMD_PID_RECORD                "pid record"
 #define SHELL_CMD_CANCEL_SCHED_POWERDOWN    "cancel_sched_powerdown"
 
 /* Static variable */
@@ -78,7 +78,7 @@ int launch_prod_screen_magnet(int argc, char *argv[]){
 
     /* Record current PID */
     char shell_cmd[100];
-    sprintf(shell_cmd, "%s %d", SHELL_CMD_RECORD_PID, getpid());
+    sprintf(shell_cmd, "%s %d", SHELL_CMD_PID_RECORD, getpid());
     system(shell_cmd);
 
     /* Init Signals */
