@@ -2,7 +2,7 @@
 #include <signal.h> 
 
 #define SHELL_CMD_PID_RECORD                "pid record"
-#define SHELL_CMD_CANCEL_SCHED_POWERDOWN    "cancel_sched_powerdown"
+#define SHELL_CMD_POWERDOWN_HANDLE          "powerdown handle"
 
 /* Static variable */
 static int stop_menu_loop = 0;
@@ -13,7 +13,7 @@ void handle_sigusr1(int sig)
 { 
 
     /* Send command to cancel any previously scheduled powerdown */
-    if (popen(SHELL_CMD_CANCEL_SCHED_POWERDOWN, "r") == NULL)
+    if (popen(SHELL_CMD_POWERDOWN_HANDLE, "r") == NULL)
     {
         /* Countdown is still ticking, so better do nothing
            than start writing and get interrupted!
