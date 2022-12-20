@@ -48,7 +48,7 @@ static int wait_event_loop(uint32_t fps){
         }
 
         /* Fill screen random */
-        SDL_Color current_color = {rand() % 128 + 128*bright, 
+        SDL_Color current_color = {rand() % 256 + 128*bright, 
                                 rand() % 256 + 128*bright, 
                                 rand() % 256 + 128*bright};
         SDL_FillRect(hw_surface, NULL, SDL_MapRGBA(hw_surface->format, 

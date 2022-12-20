@@ -5,6 +5,13 @@
 #include <SDL/SDL_ttf.h>
 //#include <SDL/SDL_image.h>
 #include "funkey_prod_screens.h"
+#include <signal.h>
+
+
+void intHandler(int dummy) {
+    deinit_libraries();
+    exit(EXIT_FAILURE);
+}
 
 
 /* Global variables */
@@ -28,13 +35,17 @@ static s_prod_test prod_tests[] = {
     {"VALIDATE", launch_prod_screen_validation, 0, NULL},
     {"SHOW_IMAGE", launch_prod_screen_showImage, 1, "img_path"},
     {"GAMMA", launch_prod_screen_gamma, 0, NULL},
-    {"TEARING", launch_prod_screen_tearingtest, 0, "(FPS)"}
+    {"TEARING", launch_prod_screen_tearingtest, 0, "(FPS)"},
+    {"TESTS", launch_prod_screen_tests, 0, NULL}
 };
 static int idx_current_prod_test = 0;
 
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
 void init_libraries(){
+
+    /* Catch SIGINT and exit */
+    signal(SIGINT, intHandler);
     
     /* export SDL_NOMOUSE=1 */
     putenv(strdup("SDL_NOMOUSE=1"));
