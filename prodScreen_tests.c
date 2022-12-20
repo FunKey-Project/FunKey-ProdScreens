@@ -172,6 +172,93 @@ void fbtft_transpose_neon(uint16_t* src, uint16_t* dst, int w, int h){
         }
     }
 }
+
+/*  
+    NEON optimized matrix transpose inverse
+    (dimensions multiple of 4, 16bits pixels)
+*/
+void fbtft_transpose_inv_neon(uint16_t* src, uint16_t* dst, int w, int h){
+    
+    /* Vars */
+    uint16x4x4_t v_tmp;
+    int y, x;
+
+    /* Main loop */
+    for (y=0; y<h; y+=4){
+        for (x=0; x<w; x+=4){
+
+            /* Neon Load */
+            v_tmp.val[0] = vld1_u16(src + (y+3)*w + x );
+            v_tmp.val[1] = vld1_u16(src + (y+2)*w + x );
+            v_tmp.val[2] = vld1_u16(src + (y+1)*w + x );
+            v_tmp.val[3] = vld1_u16(src + (y+0)*w + x );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + ( (w-1) - x - 3 )*h + (h-y-3-1), v_tmp, 3);
+            vst4_lane_u16(dst + ( (w-1) - x - 2 )*h + (h-y-3-1), v_tmp, 2);
+            vst4_lane_u16(dst + ( (w-1) - x - 1 )*h + (h-y-3-1), v_tmp, 1);
+            vst4_lane_u16(dst + ( (w-1) - x - 0 )*h + (h-y-3-1), v_tmp, 0);
+        }
+    }
+}
+
+/*  
+    NEON optimized matrix rotate 90° CW 
+    (dimensions multiple of 4, 16bits pixels)
+*/
+void fbtft_rotate_90cw_neon(uint16_t* src, uint16_t* dst, int w, int h){
+    
+    /* Vars */
+    uint16x4x4_t v_tmp;
+    int y, x;
+
+    /* Main loop */
+    for (y=0; y<h; y+=4){
+        for (x=0; x<w; x+=4){
+
+            /* Neon Load */
+            v_tmp.val[0] = vld1_u16(src + (y+3)*w + x );
+            v_tmp.val[1] = vld1_u16(src + (y+2)*w + x );
+            v_tmp.val[2] = vld1_u16(src + (y+1)*w + x );
+            v_tmp.val[3] = vld1_u16(src + (y+0)*w + x );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + (x+0)*h + (h-y-3-1), v_tmp, 0);
+            vst4_lane_u16(dst + (x+1)*h + (h-y-3-1), v_tmp, 1);
+            vst4_lane_u16(dst + (x+2)*h + (h-y-3-1), v_tmp, 2);
+            vst4_lane_u16(dst + (x+3)*h + (h-y-3-1), v_tmp, 3);
+        }
+    }
+}
+
+/*  
+    NEON optimized matrix rotate 270° CW
+    (dimensions multiple of 4, 16bits pixels)
+*/
+void fbtft_rotate_270cw_neon(uint16_t* src, uint16_t* dst, int w, int h){
+    
+    /* Vars */
+    uint16x4x4_t v_tmp;
+    int y, x;
+
+    /* Main loop */
+    for (y=0; y<h; y+=4){
+        for (x=0; x<w; x+=4){
+
+            /* Neon Load */
+            v_tmp.val[0] = vld1_u16(src + (y+0)*w + x );
+            v_tmp.val[1] = vld1_u16(src + (y+1)*w + x );
+            v_tmp.val[2] = vld1_u16(src + (y+2)*w + x );
+            v_tmp.val[3] = vld1_u16(src + (y+3)*w + x );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + ( (w-1) - x - 3 )*h + y, v_tmp, 3);
+            vst4_lane_u16(dst + ( (w-1) - x - 2 )*h + y, v_tmp, 2);
+            vst4_lane_u16(dst + ( (w-1) - x - 1 )*h + y, v_tmp, 1);
+            vst4_lane_u16(dst + ( (w-1) - x - 0 )*h + y, v_tmp, 0);
+        }
+    }
+}
 #endif //__ARM_FP
 
 
@@ -292,23 +379,23 @@ int launch_prod_screen_tests(int argc, char *argv[]){
 
     /* NEON */
     /*uint16x4x4_t v_tmp;
-    v_tmp.val[0] = vld1_u16(line_y0);
-    v_tmp.val[1] = vld1_u16(line_y1);
-    v_tmp.val[2] = vld1_u16(line_y2);
-    v_tmp.val[3] = vld1_u16(line_y3);*/
+    v_tmp.val[0] = vrev64_u16(vld1_u16(line_y3));
+    v_tmp.val[1] = vrev64_u16(vld1_u16(line_y2));
+    v_tmp.val[2] = vrev64_u16(vld1_u16(line_y1));
+    v_tmp.val[3] = vrev64_u16(vld1_u16(line_y0));*/
 
-    uint16x4_t d0 = vrev64_u16(vld1_u16(line_y3));
-    uint16x4_t d1 = vrev64_u16(vld1_u16(line_y2));
-    uint16x4_t d2 = vrev64_u16(vld1_u16(line_y1));
-    uint16x4_t d3 = vrev64_u16(vld1_u16(line_y0));
+    uint16x4_t d0 = vld1_u16(line_y3);
+    uint16x4_t d1 = vld1_u16(line_y2);
+    uint16x4_t d2 = vld1_u16(line_y1);
+    uint16x4_t d3 = vld1_u16(line_y0);
     
     uint16x4x4_t v_tmp = {d0, d1, d2, d3};
 
     uint16_t out_line_y0[4], out_line_y1[4], out_line_y2[4], out_line_y3[4];
-    vst4_lane_u16(out_line_y0, v_tmp, 0);
-    vst4_lane_u16(out_line_y1, v_tmp, 1);
-    vst4_lane_u16(out_line_y2, v_tmp, 2);
-    vst4_lane_u16(out_line_y3, v_tmp, 3);
+    vst4_lane_u16(out_line_y0, v_tmp, 3);
+    vst4_lane_u16(out_line_y1, v_tmp, 2);
+    vst4_lane_u16(out_line_y2, v_tmp, 1);
+    vst4_lane_u16(out_line_y3, v_tmp, 0);
 
 
     printf("\nFinal 4x4 block:\n");
@@ -325,18 +412,14 @@ int launch_prod_screen_tests(int argc, char *argv[]){
 
 /******************************************     1 bis (neon rotate 270 CW)      ********************************/
 #if 0
-    uint16_t line_y0[4] = {0, 1, 2, 3};
-    uint16_t line_y1[4] = {4, 5, 6, 7};
-    uint16_t line_y2[4] = {8, 9, 10, 11};
-    uint16_t line_y3[4] = {12, 13, 14, 15};
+    const uint16_t line_y0[4] = {0, 1, 2, 3};
+    const uint16_t line_y1[4] = {4, 5, 6, 7};
+    const uint16_t line_y2[4] = {8, 9, 10, 11};
+    const uint16_t line_y3[4] = {12, 13, 14, 15};
+
 
     printf("\nOriginal 4x4 block:\n");
-    /*printf("    %02d, %02d, %02d, %02d\n", line_y0[0], line_y0[1], line_y0[2], line_y0[3]);
-    printf("    %02d, %02d, %02d, %02d\n", line_y1[0], line_y1[1], line_y1[2], line_y1[3]);
-    printf("    %02d, %02d, %02d, %02d\n", line_y2[0], line_y2[1], line_y2[2], line_y2[3]);
-    printf("    %02d, %02d, %02d, %02d\n", line_y3[0], line_y3[1], line_y3[2], line_y3[3]);*/
     disp4(line_y0); disp4(line_y1); disp4(line_y2); disp4(line_y3);
-
 
     /* NEON */
     /*uint16x4x4_t v_tmp;
@@ -345,33 +428,41 @@ int launch_prod_screen_tests(int argc, char *argv[]){
     v_tmp.val[2] = vld1_u16(line_y2);
     v_tmp.val[3] = vld1_u16(line_y3);*/
 
-    uint16x4_t d0 = vrev64_u16(vld1_u16(line_y0));
-    uint16x4_t d1 = vrev64_u16(vld1_u16(line_y1));
-    uint16x4_t d2 = vrev64_u16(vld1_u16(line_y2));
-    uint16x4_t d3 = vrev64_u16(vld1_u16(line_y3));
+    uint16x4_t d0 = vld1_u16(line_y0);
+    uint16x4_t d1 = vld1_u16(line_y1);
+    uint16x4_t d2 = vld1_u16(line_y2);
+    uint16x4_t d3 = vld1_u16(line_y3);
     
     uint16x4x4_t v_tmp = {d0, d1, d2, d3};
 
     uint16_t out_line_y0[4], out_line_y1[4], out_line_y2[4], out_line_y3[4];
-    vst4_lane_u16(out_line_y0, v_tmp, 0);
-    vst4_lane_u16(out_line_y1, v_tmp, 1);
-    vst4_lane_u16(out_line_y2, v_tmp, 2);
-    vst4_lane_u16(out_line_y3, v_tmp, 3);
+    vst4_lane_u16(out_line_y0, v_tmp, 3);
+    vst4_lane_u16(out_line_y1, v_tmp, 2);
+    vst4_lane_u16(out_line_y2, v_tmp, 1);
+    vst4_lane_u16(out_line_y3, v_tmp, 0);
 
 
-    printf("\nFinal 4x4 block:\n");
-    /*printf("    %02d, %02d, %02d, %02d\n", out_line_y0[0], out_line_y0[1], out_line_y0[2], out_line_y0[3]);
-    printf("    %02d, %02d, %02d, %02d\n", out_line_y1[0], out_line_y1[1], out_line_y1[2], out_line_y1[3]);
-    printf("    %02d, %02d, %02d, %02d\n", out_line_y2[0], out_line_y2[1], out_line_y2[2], out_line_y2[3]);
-    printf("    %02d, %02d, %02d, %02d\n", out_line_y3[0], out_line_y3[1], out_line_y3[2], out_line_y3[3]);*/
+    printf("Final 4x4 block:\n");
     disp4(out_line_y0); disp4(out_line_y1); disp4(out_line_y2); disp4(out_line_y3); 
+
+
+
+    /*const uint16_t mat_src[] = {line_y0, line_y1, line_y2, line_y3};
+    const uint16_t mat_dst[4*4];
+    printf("\nmat src:\n");
+    disp4x4(mat_src);
+
+    fbtft_rotate_270cw_neon(mat_src, mat_dst, 4, 4);
+    printf("mat dst:\n");
+    disp4x4(mat_dst);*/
+
 #endif
 /**********************************************************************************/
 
 
 
 /******************************************     1 bis (neon rotate 90 CW)      ********************************/
-#if 1
+#if 0
     uint16_t line_y0[4] = {0, 1, 2, 3};
     uint16_t line_y1[4] = {4, 5, 6, 7};
     uint16_t line_y2[4] = {8, 9, 10, 11};
@@ -679,6 +770,221 @@ int launch_prod_screen_tests(int argc, char *argv[]){
     /* free */ 
     SDL_FreeSurface(image_rgb_16b);
     SDL_FreeSurface(image_rgb_16b_transposed);
+#endif //0
+/*************************************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************     3 bis     ********************************/
+#if 0
+    /* Vars */
+    int h = image_rgb_16b->h, w = image_rgb_16b->w;
+    uint16_t * p = (uint16_t *)image_rgb_16b->pixels;
+    int y, x;
+
+    /* Rotate 90 CW */
+    SDL_Surface *image_rgb_16b_rotated_90_neon = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+    uint16_t * p2 = (uint16_t *)image_rgb_16b_rotated_90_neon->pixels;
+    fbtft_rotate_90cw_neon(p, p2, w, h);
+
+    /* Transpose inv */
+    SDL_Surface *image_rgb_16b_transp_inv_neon = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+    uint16_t * p3 = (uint16_t *)image_rgb_16b_transp_inv_neon->pixels;
+    fbtft_transpose_inv_neon(p, p3, w, h);
+
+    /* Rotate 270 CW */
+    SDL_Surface *image_rgb_16b_rotated_270_neon = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+    uint16_t * p4 = (uint16_t *)image_rgb_16b_rotated_270_neon->pixels;
+    fbtft_rotate_270cw_neon(p, p4, w, h);
+    
+    /* Blit image */
+    SDL_Surface * imgs_to_blit[] =  {
+                                        image_rgb_16b,
+                                        image_rgb_16b_rotated_270_neon,
+                                        image_rgb_16b_transp_inv_neon,
+                                        image_rgb_16b_rotated_90_neon,
+                                    };
+    int nb_images_to_blit = sizeof(imgs_to_blit)/sizeof(imgs_to_blit[0]);
+    int cur_idx_blit = 1;                                                
+
+
+    SDL_BlitSurface(imgs_to_blit[cur_idx_blit], NULL, hw_surface, NULL);
+
+    /// -------- Main loop ---------
+    while (!stop_menu_loop)
+    {
+        /// -------- Handle Keyboard Events ---------
+        while (SDL_PollEvent(&event))
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                stop_menu_loop = 1;
+        break;
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_m:
+                    stop_menu_loop = 1;
+                    res = ERROR_MANUAL_FAIL;
+                    break;
+
+                case SDLK_q:
+                case SDLK_n:
+                case SDLK_ESCAPE:
+                    stop_menu_loop = 1;
+                    res = 0;
+                    break;
+
+                case SDLK_l:
+                    cur_idx_blit = cur_idx_blit?cur_idx_blit-1:nb_images_to_blit-1;
+                    SDL_BlitSurface(imgs_to_blit[cur_idx_blit], NULL, hw_surface, NULL);
+                    printf("idx = %d\n", cur_idx_blit);
+                    break;
+
+                case SDLK_r:
+                    cur_idx_blit = (cur_idx_blit+1)%nb_images_to_blit;
+                    SDL_BlitSurface(imgs_to_blit[cur_idx_blit], NULL, hw_surface, NULL);
+                    break;
+
+                default:                
+                    break;
+            }
+        }
+
+        /* To investigate but with Buildroot, we need this: */
+        SDL_Flip(hw_surface);
+
+        /* Sleep for some time */
+        SDL_Delay(1000/60);
+    }
+
+    /* free */ 
+    SDL_FreeSurface(image_rgb_16b);
+    SDL_FreeSurface(image_rgb_16b_rotated_90_neon);
+#endif //0
+/*************************************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************     3 bis (non squared)    ********************************/
+#if 1
+    /* Vars */
+    int w = image_rgb_16b->w/2, h = image_rgb_16b->h;
+    SDL_Surface *image_rgb_16b_notsquare = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 16, 0,0,0,0);
+    //SDL_Rect dst_rect={ (image_rgb_16b->w-w)/2, 0, w, h };
+    SDL_BlitSurface(image_rgb_16b, NULL, image_rgb_16b_notsquare, NULL);
+    uint16_t * p = (uint16_t *)image_rgb_16b_notsquare->pixels;
+    int y, x;
+
+    /* Rotate 90 CW */
+    SDL_Surface *image_rgb_16b_rotated_90_neon = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+    uint16_t * p2 = (uint16_t *)image_rgb_16b_rotated_90_neon->pixels;
+    fbtft_rotate_90cw_neon(p, p2, w, h);
+
+    /* Transpose inv */
+    SDL_Surface *image_rgb_16b_transp_inv_neon = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+    uint16_t * p3 = (uint16_t *)image_rgb_16b_transp_inv_neon->pixels;
+    fbtft_transpose_inv_neon(p, p3, w, h);
+
+    /* Rotate 270 CW */
+    SDL_Surface *image_rgb_16b_rotated_270_neon = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+    uint16_t * p4 = (uint16_t *)image_rgb_16b_rotated_270_neon->pixels;
+    fbtft_rotate_270cw_neon(p, p4, w, h);
+
+    /* Transpose */
+    SDL_Surface *image_rgb_16b_transp_neon = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+    uint16_t * p5 = (uint16_t *)image_rgb_16b_transp_neon->pixels;
+    fbtft_transpose_neon(p, p5, w, h);
+    
+    /* Blit image */
+    SDL_Surface * imgs_to_blit[] =  {
+                                        image_rgb_16b_notsquare,
+                                        image_rgb_16b_rotated_270_neon,
+                                        image_rgb_16b_rotated_90_neon,
+                                        image_rgb_16b_transp_neon,
+                                        image_rgb_16b_transp_inv_neon
+                                    };
+    int nb_images_to_blit = sizeof(imgs_to_blit)/sizeof(imgs_to_blit[0]);
+    int cur_idx_blit = 0;                                                
+
+
+    SDL_BlitSurface(imgs_to_blit[cur_idx_blit], NULL, hw_surface, NULL);
+
+    /// -------- Main loop ---------
+    while (!stop_menu_loop)
+    {
+        /// -------- Handle Keyboard Events ---------
+        while (SDL_PollEvent(&event))
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                stop_menu_loop = 1;
+        break;
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_m:
+                    stop_menu_loop = 1;
+                    res = ERROR_MANUAL_FAIL;
+                    break;
+
+                case SDLK_q:
+                case SDLK_n:
+                case SDLK_ESCAPE:
+                    stop_menu_loop = 1;
+                    res = 0;
+                    break;
+
+                case SDLK_l:
+                    cur_idx_blit = cur_idx_blit?cur_idx_blit-1:nb_images_to_blit-1;
+                    SDL_BlitSurface(imgs_to_blit[cur_idx_blit], NULL, hw_surface, NULL);
+                    printf("idx = %d\n", cur_idx_blit);
+                    break;
+
+                case SDLK_r:
+                    cur_idx_blit = (cur_idx_blit+1)%nb_images_to_blit;
+                    SDL_BlitSurface(imgs_to_blit[cur_idx_blit], NULL, hw_surface, NULL);
+                    break;
+
+                default:                
+                    break;
+            }
+        }
+
+        /* To investigate but with Buildroot, we need this: */
+        SDL_Flip(hw_surface);
+
+        /* Sleep for some time */
+        SDL_Delay(1000/60);
+    }
+
+    /* free */ 
+    SDL_FreeSurface(image_rgb_16b);
+    SDL_FreeSurface(image_rgb_16b_rotated_90_neon);
 #endif //0
 /*************************************************************************************/
 
