@@ -158,6 +158,12 @@ void fbtft_transpose_neon(uint16_t* src, uint16_t* dst, int w, int h){
     for (y=0; y<h; y+=4){
         for (x=0; x<w; x+=4){
 
+            /* 1% CPU gain */
+            __builtin_prefetch(src + (y+0)*w + x + 4);
+            __builtin_prefetch(src + (y+1)*w + x + 4);
+            __builtin_prefetch(src + (y+2)*w + x + 4);
+            __builtin_prefetch(src + (y+3)*w + x + 4);
+
             /* Neon Load */
             v_tmp.val[0] = vld1_u16(src + (y+0)*w + x );
             v_tmp.val[1] = vld1_u16(src + (y+1)*w + x );
@@ -187,6 +193,12 @@ void fbtft_transpose_inv_neon(uint16_t* src, uint16_t* dst, int w, int h){
     for (y=0; y<h; y+=4){
         for (x=0; x<w; x+=4){
 
+            /* 1% CPU gain */
+            __builtin_prefetch(src + (y+0)*w + x + 4);
+            __builtin_prefetch(src + (y+1)*w + x + 4);
+            __builtin_prefetch(src + (y+2)*w + x + 4);
+            __builtin_prefetch(src + (y+3)*w + x + 4);
+
             /* Neon Load */
             v_tmp.val[0] = vld1_u16(src + (y+3)*w + x );
             v_tmp.val[1] = vld1_u16(src + (y+2)*w + x );
@@ -215,6 +227,12 @@ void fbtft_rotate_90cw_neon(uint16_t* src, uint16_t* dst, int w, int h){
     /* Main loop */
     for (y=0; y<h; y+=4){
         for (x=0; x<w; x+=4){
+
+            /* 1% CPU gain */
+            __builtin_prefetch(src + (y+0)*w + x + 4);
+            __builtin_prefetch(src + (y+1)*w + x + 4);
+            __builtin_prefetch(src + (y+2)*w + x + 4);
+            __builtin_prefetch(src + (y+3)*w + x + 4);
 
             /* Neon Load */
             v_tmp.val[0] = vld1_u16(src + (y+3)*w + x );
@@ -256,6 +274,231 @@ void fbtft_rotate_270cw_neon(uint16_t* src, uint16_t* dst, int w, int h){
             vst4_lane_u16(dst + ( (w-1) - x - 2 )*h + y, v_tmp, 2);
             vst4_lane_u16(dst + ( (w-1) - x - 1 )*h + y, v_tmp, 1);
             vst4_lane_u16(dst + ( (w-1) - x - 0 )*h + y, v_tmp, 0);
+        }
+    }
+}
+
+/*  
+    NEON optimized matrix rotate 270° CW
+    (dimensions multiple of 4, 16bits pixels)
+*/
+#define PREFETCH_ORDER_X    32
+#define PREFETCH_ORDER_Y    4
+void fbtft_rotate_270cw_neon_prefetch(uint16_t* src, uint16_t* dst, int w, int h){
+    
+    /* Vars */
+    uint16x4x4_t v_tmp;
+    int y, x;
+
+    /* Main loop */
+    for (y=0; y<h; y+=4){
+
+        /* Prefetch src */
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+0)*w + x);
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+1)*w + x);
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+2)*w + x);
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+3)*w + x);
+
+        /* Prefetch dst */
+        /*__builtin_prefetch(dst + ( (w-1) - x - 3 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 2 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 1 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 0 + PREFETCH_ORDER_Y )*h + y + 4, 1);*/
+
+        for (x=0; x<w; x+=4){
+
+            /* Prefetch src */
+            __builtin_prefetch(src + (y+0)*w + x + PREFETCH_ORDER_X);
+            __builtin_prefetch(src + (y+1)*w + x + PREFETCH_ORDER_X);
+            __builtin_prefetch(src + (y+2)*w + x + PREFETCH_ORDER_X);
+            __builtin_prefetch(src + (y+3)*w + x + PREFETCH_ORDER_X);
+
+            /* Prefetch dst */
+            /*__builtin_prefetch(dst + ( (w-1) - x - 3 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 2 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 1 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 0 + PREFETCH_ORDER_X )*h + y, 1);*/
+
+            /* Neon Load */
+            v_tmp.val[0] = vld1_u16(src + (y+0)*w + x );
+            v_tmp.val[1] = vld1_u16(src + (y+1)*w + x );
+            v_tmp.val[2] = vld1_u16(src + (y+2)*w + x );
+            v_tmp.val[3] = vld1_u16(src + (y+3)*w + x );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + ( (w-1) - x - 3 )*h + y, v_tmp, 3);
+            vst4_lane_u16(dst + ( (w-1) - x - 2 )*h + y, v_tmp, 2);
+            vst4_lane_u16(dst + ( (w-1) - x - 1 )*h + y, v_tmp, 1);
+            vst4_lane_u16(dst + ( (w-1) - x - 0 )*h + y, v_tmp, 0);
+        }
+    }
+}
+
+/*  
+    NEON optimized matrix rotate 270° CW
+    (dimensions multiple of 4, 16bits pixels)
+*/
+#define PREFETCH_ORDER_X    32
+#define PREFETCH_ORDER_Y    4
+void fbtft_rotate_270cw_neon_prefetch2(uint16_t* src, uint16_t* dst, int w, int h){
+    
+    /* Vars */
+    uint16x4x4_t v_tmp, v_tmp2, v_tmp3, v_tmp4;
+    int y, x;
+
+    /* Main loop */
+    for (y=0; y<h; y+=4){
+
+        /* Prefetch src */
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+0)*w + x);
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+1)*w + x);
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+2)*w + x);
+        __builtin_prefetch(src + (y+PREFETCH_ORDER_Y+3)*w + x);
+
+        /* Prefetch dst */
+        /*__builtin_prefetch(dst + ( (w-1) - x - 3 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 2 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 1 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 0 + PREFETCH_ORDER_Y )*h + y + 4, 1);*/
+
+        for (x=0; x<w; x+=16){
+
+            /* Prefetch src */
+            __builtin_prefetch(src + (y+0)*w + x + PREFETCH_ORDER_X);
+            __builtin_prefetch(src + (y+1)*w + x + PREFETCH_ORDER_X);
+            __builtin_prefetch(src + (y+2)*w + x + PREFETCH_ORDER_X);
+            __builtin_prefetch(src + (y+3)*w + x + PREFETCH_ORDER_X);
+
+            /* Prefetch dst */
+            /*__builtin_prefetch(dst + ( (w-1) - x - 3 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 2 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 1 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 0 + PREFETCH_ORDER_X )*h + y, 1);*/
+
+            /* Neon Load */
+            v_tmp.val[0] = vld1_u16(src + (y+0)*w + x );
+            v_tmp.val[1] = vld1_u16(src + (y+1)*w + x );
+            v_tmp.val[2] = vld1_u16(src + (y+2)*w + x );
+            v_tmp.val[3] = vld1_u16(src + (y+3)*w + x );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + ( (w-1) - x - 3 )*h + y, v_tmp, 3);
+            vst4_lane_u16(dst + ( (w-1) - x - 2 )*h + y, v_tmp, 2);
+            vst4_lane_u16(dst + ( (w-1) - x - 1 )*h + y, v_tmp, 1);
+            vst4_lane_u16(dst + ( (w-1) - x - 0 )*h + y, v_tmp, 0);
+
+            /* Neon Load */
+            v_tmp2.val[0] = vld1_u16(src + (y+0)*w + x+4 );
+            v_tmp2.val[1] = vld1_u16(src + (y+1)*w + x+4 );
+            v_tmp2.val[2] = vld1_u16(src + (y+2)*w + x+4 );
+            v_tmp2.val[3] = vld1_u16(src + (y+3)*w + x+4 );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + ( (w-1) - x+4 - 3 )*h + y, v_tmp2, 3);
+            vst4_lane_u16(dst + ( (w-1) - x+4 - 2 )*h + y, v_tmp2, 2);
+            vst4_lane_u16(dst + ( (w-1) - x+4 - 1 )*h + y, v_tmp2, 1);
+            vst4_lane_u16(dst + ( (w-1) - x+4 - 0 )*h + y, v_tmp2, 0);
+
+            /* Neon Load */
+            v_tmp3.val[0] = vld1_u16(src + (y+0)*w + x+8 );
+            v_tmp3.val[1] = vld1_u16(src + (y+1)*w + x+8 );
+            v_tmp3.val[2] = vld1_u16(src + (y+2)*w + x+8 );
+            v_tmp3.val[3] = vld1_u16(src + (y+3)*w + x+8 );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + ( (w-1) - x+8 - 3 )*h + y, v_tmp3, 3);
+            vst4_lane_u16(dst + ( (w-1) - x+8 - 2 )*h + y, v_tmp3, 2);
+            vst4_lane_u16(dst + ( (w-1) - x+8 - 1 )*h + y, v_tmp3, 1);
+            vst4_lane_u16(dst + ( (w-1) - x+8 - 0 )*h + y, v_tmp3, 0);
+
+            /* Neon Load */
+            v_tmp4.val[0] = vld1_u16(src + (y+0)*w + x+12 );
+            v_tmp4.val[1] = vld1_u16(src + (y+1)*w + x+12 );
+            v_tmp4.val[2] = vld1_u16(src + (y+2)*w + x+12 );
+            v_tmp4.val[3] = vld1_u16(src + (y+3)*w + x+12 );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16(dst + ( (w-1) - x+12 - 3 )*h + y, v_tmp4, 3);
+            vst4_lane_u16(dst + ( (w-1) - x+12 - 2 )*h + y, v_tmp4, 2);
+            vst4_lane_u16(dst + ( (w-1) - x+12 - 1 )*h + y, v_tmp4, 1);
+            vst4_lane_u16(dst + ( (w-1) - x+12 - 0 )*h + y, v_tmp4, 0);
+        }
+    }
+}
+
+
+
+
+
+
+#define prefetch(x) __builtin_prefetch(x)
+#ifndef PREFETCH_STRIDE
+#define PREFETCH_STRIDE (2*32)
+#endif
+static inline void prefetch_range(void *addr, size_t len)
+{
+    char *cp;
+    char *end = addr + len;
+
+    for (cp = addr; cp < end; cp += PREFETCH_STRIDE)
+        prefetch(cp);
+}
+
+
+
+/*  
+    NEON optimized matrix rotate 270° CW
+    (dimensions multiple of 4, 16bits pixels)
+*/
+#define PREFETCH_ORDER_X    20
+#define PREFETCH_ORDER_Y    4
+#define PREFETCH_RANGE      1
+void fbtft_rotate_270cw_neon_prefetch3(uint16_t* src, uint16_t* dst, int w, int h){
+    
+    /* Vars */
+    uint16x4x4_t v_tmp;
+    int y, x;
+
+    /* Main loop */
+    for (y=0; y<h; y+=4){
+
+        /* Prefetch src */
+        prefetch_range(src + (y+PREFETCH_ORDER_Y+0)*w + x, PREFETCH_RANGE);
+        prefetch_range(src + (y+PREFETCH_ORDER_Y+1)*w + x, PREFETCH_RANGE);
+        prefetch_range(src + (y+PREFETCH_ORDER_Y+2)*w + x, PREFETCH_RANGE);
+        prefetch_range(src + (y+PREFETCH_ORDER_Y+3)*w + x, PREFETCH_RANGE);
+
+        /* Prefetch dst */
+        /*__builtin_prefetch(dst + ( (w-1) - x - 3 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 2 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 1 + PREFETCH_ORDER_Y )*h + y + 4, 1);
+        __builtin_prefetch(dst + ( (w-1) - x - 0 + PREFETCH_ORDER_Y )*h + y + 4, 1);*/
+
+        for (x=0; x<w; x+=4){
+
+            /* Prefetch src */
+            prefetch_range(src + (y+0)*w + x + PREFETCH_ORDER_X, PREFETCH_RANGE);
+            prefetch_range(src + (y+1)*w + x + PREFETCH_ORDER_X, PREFETCH_RANGE);
+            prefetch_range(src + (y+2)*w + x + PREFETCH_ORDER_X, PREFETCH_RANGE);
+            prefetch_range(src + (y+3)*w + x + PREFETCH_ORDER_X, PREFETCH_RANGE);
+
+            /* Prefetch dst */
+            /*__builtin_prefetch(dst + ( (w-1) - x - 3 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 2 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 1 + PREFETCH_ORDER_X )*h + y, 1);
+            __builtin_prefetch(dst + ( (w-1) - x - 0 + PREFETCH_ORDER_X )*h + y, 1);*/
+
+            /* Neon Load */
+            v_tmp.val[0] = vld1_u16( &src[(y+0)*w + x] );
+            v_tmp.val[1] = vld1_u16( &src[(y+1)*w + x] );
+            v_tmp.val[2] = vld1_u16( &src[(y+2)*w + x] );
+            v_tmp.val[3] = vld1_u16( &src[(y+3)*w + x] );
+
+            /* Neon store (4 interleaved) */
+            vst4_lane_u16( &dst[ ( (w-1) - x - 3 )*h + y ], v_tmp, 3);
+            vst4_lane_u16( &dst[ ( (w-1) - x - 2 )*h + y ], v_tmp, 2);
+            vst4_lane_u16( &dst[ ( (w-1) - x - 1 )*h + y ], v_tmp, 1);
+            vst4_lane_u16( &dst[ ( (w-1) - x - 0 )*h + y ], v_tmp, 0);
         }
     }
 }
@@ -891,7 +1134,7 @@ int launch_prod_screen_tests(int argc, char *argv[]){
 
 
 /******************************************     3 bis (non squared)    ********************************/
-#if 1
+#if 0
     /* Vars */
     int w = image_rgb_16b->w/2, h = image_rgb_16b->h;
     SDL_Surface *image_rgb_16b_notsquare = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 16, 0,0,0,0);
@@ -1008,6 +1251,7 @@ int h = image_rgb_16b->h, w = image_rgb_16b->w;
 uint16_t * p = (uint16_t *)image_rgb_16b->pixels;
 SDL_Surface *image_rgb_16b_transposed = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
 uint16_t * p2 = (uint16_t *)image_rgb_16b_transposed->pixels;
+
 int i;
 uint32_t now = SDL_GetTicks();
 
@@ -1051,6 +1295,65 @@ now = SDL_GetTicks();
 for (i=0; i<ITERATIONS; i++) fbtft_transpose_neon(p, p2, w, h);
 printf("Translate neon: %dms\n", SDL_GetTicks()-now);
 now = SDL_GetTicks();
+#endif //__ARM_FP
+
+#endif
+/*************************************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************     4 bis (optims neon)    ********************************/
+#if 1
+//* Vars */
+int h = image_rgb_16b->h, w = image_rgb_16b->w;
+uint16_t * p = (uint16_t *)image_rgb_16b->pixels;
+SDL_Surface *image_rgb_16b_transposed = SDL_CreateRGBSurface(SDL_SWSURFACE, h, w, 16, 0,0,0,0);
+uint16_t * p2 = (uint16_t *)image_rgb_16b_transposed->pixels;
+
+int i;
+uint32_t now = SDL_GetTicks();
+
+
+/* Saved perfs for 10000 iterations: */
+/*  Rotate square optimized with memcpy: 2381ms
+*   Rotate square optimized exported: 9847ms
+*   Translate soft: 8645ms
+*   Translate soft a la mano 4x4: 11110ms
+*   Translate neon: 7800ms
+*/
+
+
+
+#define ITERATIONS  3000
+printf("\n");
+
+#ifdef __ARM_FP
+
+/* Rotate 270 with prefetch neon */
+for (i=0; i<ITERATIONS; i++) fbtft_rotate_270cw_neon_prefetch2(p, p2, w, h);
+printf("Rotate 270 cw neon with prefetch2: %dms\n", SDL_GetTicks()-now);
+now = SDL_GetTicks();
+
+/* Rotate 270 neon */
+for (i=0; i<ITERATIONS; i++) fbtft_rotate_270cw_neon(p, p2, w, h);
+printf("Rotate 270 cw neon: %dms\n", SDL_GetTicks()-now);
+now = SDL_GetTicks();
+
+/* Rotate 270 with prefetch neon */
+for (i=0; i<ITERATIONS; i++) fbtft_rotate_270cw_neon_prefetch(p, p2, w, h);
+printf("Rotate 270 cw neon with prefetch: %dms\n", SDL_GetTicks()-now);
+now = SDL_GetTicks();
+
 #endif //__ARM_FP
 
 #endif
