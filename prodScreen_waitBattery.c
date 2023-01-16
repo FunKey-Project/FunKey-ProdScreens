@@ -27,9 +27,9 @@ typedef enum{BAT_TESTS} ENUM_BAT_TESTS;
 
 
 /// ----------- STATIC VARS --------------
-#undef X
+/*#undef X
 #define X(a, b) b,
-static const char *bat_tests_strings[] = {BAT_TESTS};
+static const char *bat_tests_strings[] = {BAT_TESTS};*/
 
 static int bat_measurements[NB_BAT_MESUREMENTS] = {0};
 static int idx_bat_measurements = 0;
@@ -64,7 +64,7 @@ static int is_battery_present(){
 static int get_battery_voltage(){
     char buf[10];
     FILE *fp;
-    int res = 0;
+    //int res = 0;
 
     /* Read battery voltage file */
     char *file = BATTERY_VOLTAGE_NOW_FILE;
@@ -113,7 +113,7 @@ static void render_static_text(){
 
     /* Write Title */
     text_surface = TTF_RenderText_Shaded(font_title, prog_title, text_color, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
+    text_pos.x = display_width/2 - text_surface->w/2;
     text_pos.y = Y_PADDING_BAT_RES;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
@@ -122,15 +122,15 @@ static void render_static_text(){
     /*SDL_Color dark_gray={20,20,20};
     text_surface = TTF_RenderText_Shaded(font_title, "BATTERY TESTS:", dark_gray, bg_color);
     text_pos.x = X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE/2 - (text_surface->h*(NB_BAT_TESTS+1) + Y_PADDING_BAT_RES*NB_BAT_TESTS)/2;
+    text_pos.y = display_height/2 - (text_surface->h*(NB_BAT_TESTS+1) + Y_PADDING_BAT_RES*NB_BAT_TESTS)/2;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);*/
 
     /* Write "Test title*/
     /*SDL_Color red={255,0,0};
     text_surface = TTF_RenderText_Shaded(font_title, "INSERT BATTERY", red, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-    text_pos.y = SCREEN_VERTICAL_SIZE/2 - text_surface->h/2;
+    text_pos.x = display_width/2 - text_surface->w/2;
+    text_pos.y = display_height/2 - text_surface->h/2;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);*/
 
@@ -141,12 +141,12 @@ static void render_static_text(){
     SDL_Color red_color={220,20,20};
     text_surface = TTF_RenderText_Shaded(font_info, "Press", red_color, bg_color);
     text_pos.x = X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING_BAT_RES - 2*text_surface->h;
+    text_pos.y = display_height - Y_PADDING_BAT_RES - 2*text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
     text_surface = TTF_RenderText_Shaded(font_info, "L=FAIL", red_color, bg_color);
     text_pos.x = X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING_BAT_RES - text_surface->h;
+    text_pos.y = display_height - Y_PADDING_BAT_RES - text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 
@@ -156,13 +156,13 @@ static void render_static_text(){
     */
     /*SDL_Color green_color={20,220,20};
     text_surface = TTF_RenderText_Shaded(font_info, "Press", green_color, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE - text_surface->w - X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING_BAT_RES - 2*text_surface->h;
+    text_pos.x = display_width - text_surface->w - X_PADDING;
+    text_pos.y = display_height - Y_PADDING_BAT_RES - 2*text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
     text_surface = TTF_RenderText_Shaded(font_info, "R=OK", green_color, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE - text_surface->w - X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING_BAT_RES - text_surface->h;
+    text_pos.x = display_width - text_surface->w - X_PADDING;
+    text_pos.y = display_height - Y_PADDING_BAT_RES - text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);*/
 
@@ -239,8 +239,8 @@ static int wait_event_loop(){
 		            	/* Show ERROR message */
 					    SDL_Color red={255,0,0};
 					    text_surface = TTF_RenderText_Shaded(font_title, "CONNECT BATTERY", red, bg_color);
-					    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-					    text_pos.y = SCREEN_VERTICAL_SIZE/2 - Y_PADDING - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
+					    text_pos.x = display_width/2 - text_surface->w/2;
+					    text_pos.y = display_height/2 - Y_PADDING - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
 					    	+ (text_surface->h+Y_PADDING_BAT_RES)*cur_bat_test_idx;
 					    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
 					    SDL_FreeSurface(text_surface);
@@ -266,8 +266,8 @@ static int wait_event_loop(){
 		            	/* Show ERROR message */
 					    SDL_Color red={255,0,0};
 					    text_surface = TTF_RenderText_Shaded(font_title, "UNPLUG USB", red, bg_color);
-					    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-					    text_pos.y = SCREEN_VERTICAL_SIZE/2 - Y_PADDING  - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
+					    text_pos.x = display_width/2 - text_surface->w/2;
+					    text_pos.y = display_height/2 - Y_PADDING  - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
 					    	+ (text_surface->h+Y_PADDING_BAT_RES)*cur_bat_test_idx;
 					    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
 					    SDL_FreeSurface(text_surface);
@@ -306,8 +306,8 @@ static int wait_event_loop(){
 		            		if(false_measurement_found){
 							    SDL_Color red={255,0,0};
 							    text_surface = TTF_RenderText_Shaded(font_title, "WRONG VOLTAGE", red, bg_color);
-							    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-							    text_pos.y = SCREEN_VERTICAL_SIZE/2 - Y_PADDING  - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
+							    text_pos.x = display_width/2 - text_surface->w/2;
+							    text_pos.y = display_height/2 - Y_PADDING  - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
 							    	+ (text_surface->h+Y_PADDING_BAT_RES)*cur_bat_test_idx;
 							    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
 							    SDL_FreeSurface(text_surface);
@@ -326,8 +326,8 @@ static int wait_event_loop(){
 						    char text_tmp[40];
 						    sprintf(text_tmp, "Check voltage (%d/%d)...", idx_bat_measurements, NB_BAT_MESUREMENTS);
 						    text_surface = TTF_RenderText_Shaded(font_info, text_tmp, dark_gray, bg_color);
-						    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-						    text_pos.y = SCREEN_VERTICAL_SIZE/2 - Y_PADDING  - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
+						    text_pos.x = display_width/2 - text_surface->w/2;
+						    text_pos.y = display_height/2 - Y_PADDING  - (text_surface->h*(NB_BAT_TESTS) + Y_PADDING_BAT_RES*(NB_BAT_TESTS-1))/2 
 						    	+ (text_surface->h+Y_PADDING_BAT_RES)*cur_bat_test_idx;
 						    SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
 						    SDL_FreeSurface(text_surface);

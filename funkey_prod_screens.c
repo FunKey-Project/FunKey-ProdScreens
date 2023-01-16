@@ -8,11 +8,6 @@
 #include <signal.h>
 
 
-void intHandler(int dummy) {
-    deinit_libraries();
-    exit(EXIT_FAILURE);
-}
-
 
 /* Global variables */
 SDL_Surface *hw_surface = NULL;
@@ -21,6 +16,8 @@ TTF_Font *font_info = NULL;
 SDL_Color bg_color = {COLOR_BG_R, COLOR_BG_G, COLOR_BG_B};
 SDL_Color text_color = {COLOR_TEXT_R, COLOR_TEXT_G, COLOR_TEXT_B};
 char *prog_title = "FUNKEY S TESTS";
+int display_width = 0;
+int display_height = 0;
 
 /* Static Variables */
 static s_prod_test prod_tests[] = {
@@ -42,7 +39,25 @@ static int idx_current_prod_test = 0;
 
 
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
+void deinit_libraries(){
+    /// ------ Close font -------
+    TTF_CloseFont(font_title);
+    TTF_CloseFont(font_info);
+
+    /// deinit libs
+    TTF_Quit();
+    SDL_Quit();
+}
+
+void intHandler(int dummy) {
+    deinit_libraries();
+    exit(EXIT_FAILURE);
+}
+
 void init_libraries(){
+
+    /* Vars */
+    SDL_Rect **modes;
 
     /* Catch SIGINT and exit */
     signal(SIGINT, intHandler);
@@ -64,7 +79,7 @@ void init_libraries(){
         exit(EXIT_FAILURE);
     }
 
-    /// ----- Loading the fonts -----
+    /* Loading the fonts */
     font_title = TTF_OpenFont(FONT_NAME_TITLE, FONT_SIZE_TITLE);
     if(!font_title){
         printf("ERROR in init_menu_SDL: Could not open menu font %s, %s\n", FONT_NAME_TITLE, SDL_GetError());
@@ -76,30 +91,47 @@ void init_libraries(){
         exit(EXIT_FAILURE);
     }
 
+    /* Get available fullscreen/hardware modes */
+    modes=SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWSURFACE);
+
+    /* Check is there are any modes available */
+    if(modes == (SDL_Rect **)0){
+        printf("No modes available!\n");
+        exit(-1);
+    }
+
+    /* Check if our resolution is restricted */
+    if(modes == (SDL_Rect **)-1){
+        printf("All resolutions available.\n");
+    }
+    else{
+        /* Print valid modes */
+        printf("Available Modes:\n");
+        for(int i=0;modes[i];++i){
+            printf("  %d x %d\n", modes[i]->w, modes[i]->h);
+        }
+    }
+
+    /* Get display dimensions (1st returned mode) */
+    display_width = modes[0]->w;
+    display_height = modes[0]->h;
+
     /// Open HW screen and set video mode 240x240
-    hw_surface = SDL_SetVideoMode(SCREEN_HORIZONTAL_SIZE, SCREEN_VERTICAL_SIZE, 
-                        32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
-    /*hw_surface = SDL_SetVideoMode(SCREEN_HORIZONTAL_SIZE, SCREEN_VERTICAL_SIZE, 
-                        32, SDL_HWSURFACE);*/
+    hw_surface = SDL_SetVideoMode(display_width, display_height, 
+                        16, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+    /*hw_surface = SDL_SetVideoMode(display_width, display_height, 
+                        32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);*/
     if (hw_surface == NULL)
     {
         fprintf(stderr, "ERROR SDL_SetVideoMode: %s\n", SDL_GetError());
         exit(EXIT_FAILURE);
     }
+
+    /* Extra */
     SDL_ShowCursor(0);
     char prog_name[50];
     sprintf(prog_name, "FunKey_Prod_%s", prod_tests[idx_current_prod_test].cmd_line_argument );
     SDL_WM_SetCaption(prog_name, NULL);
-}
-
-void deinit_libraries(){
-    /// ------ Close font -------
-    TTF_CloseFont(font_title);
-    TTF_CloseFont(font_info);
-
-    /// deinit libs
-    TTF_Quit();
-    SDL_Quit();
 }
 
 void usage(char *progname){

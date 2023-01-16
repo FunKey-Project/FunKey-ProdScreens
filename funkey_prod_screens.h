@@ -26,9 +26,6 @@
 /// Defines
 #define ERROR_MANUAL_FAIL       2
 
-#define SCREEN_HORIZONTAL_SIZE  240
-#define SCREEN_VERTICAL_SIZE    240
-
 #define SLEEP_PERIOD_MS         100
 
 #define COLOR_BG_R      255
@@ -63,6 +60,8 @@ extern TTF_Font *font_info;
 extern SDL_Color bg_color;
 extern SDL_Color text_color;
 extern char *prog_title;
+extern int display_width;
+extern int display_height;
 
 
 #endif //__FUNKEY_PROD_SCREENS__

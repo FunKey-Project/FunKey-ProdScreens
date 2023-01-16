@@ -23,8 +23,10 @@ CC=$(CROSS_COMPILE)gcc
 # Other options
 ifeq ($(platform), funkey)
 	CFLAGS += $(shell /opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/bin/sdl-config --cflags)
-	CFLAGS += -O2 -mfloat-abi=hard -ffast-math -funsafe-math-optimizations -fno-PIC -march=armv7-a+neon-vfpv4 -mtune=cortex-a7 -mfpu=neon-vfpv4
 	#CFLAGS += -O2
+	CFLAGS += -O3
+	CFLAGS += -mfloat-abi=hard -ffast-math -funsafe-math-optimizations -fno-PIC -march=armv7-a+neon-vfpv4 -mtune=cortex-a7 -mfpu=neon-vfpv4
+	#CFLAGS += -ffreestanding -mfpu=neon -mfloat-abi=hard
 	LIBS += $(shell /opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/bin/sdl-config --libs)
 else
 	CFLAGS += `sdl-config --cflags`

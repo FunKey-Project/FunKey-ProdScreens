@@ -9,8 +9,8 @@
 /// -------------- FUNCTIONS IMPLEMENTATION --------------
 int launch_prod_screen_gamma(int argc, char *argv[]){
     SDL_Event event;
-    SDL_Surface *text_surface = NULL;
-    SDL_Rect text_pos;
+    //SDL_Surface *text_surface = NULL;
+    //SDL_Rect text_pos;
     int res = EXIT_FAILURE;
     int stop_menu_loop = 0;
 

@@ -58,16 +58,16 @@ int launch_prod_screen_fail(int argc, char *argv[]){
     /* Write Title */
     SDL_Color red={255,0,0};
     text_surface = TTF_RenderText_Shaded(font_title, prog_title, red, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
+    text_pos.x = display_width/2 - text_surface->w/2;
     text_pos.y = Y_PADDING;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 
     /* Write "Screen ok ? */
     text_surface = TTF_RenderText_Shaded(font_title, "FAILED", red, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-    text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
-    text_pos.y = SCREEN_VERTICAL_SIZE/2 - text_surface->h/2;
+    text_pos.x = display_width/2 - text_surface->w/2;
+    text_pos.x = display_width/2 - text_surface->w/2;
+    text_pos.y = display_height/2 - text_surface->h/2;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 
@@ -78,12 +78,12 @@ int launch_prod_screen_fail(int argc, char *argv[]){
     SDL_Color red_color={220,20,20};
     text_surface = TTF_RenderText_Shaded(font_info, "Press", red_color, bg_color);
     text_pos.x = X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING - 2*text_surface->h;
+    text_pos.y = display_height - Y_PADDING - 2*text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
     text_surface = TTF_RenderText_Shaded(font_info, "L=STOP", red_color, bg_color);
     text_pos.x = X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING - text_surface->h;
+    text_pos.y = display_height - Y_PADDING - text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 
@@ -93,13 +93,13 @@ int launch_prod_screen_fail(int argc, char *argv[]){
     */
     SDL_Color green_color={20,20,220};
     text_surface = TTF_RenderText_Shaded(font_info, "Press", green_color, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE - text_surface->w - X_PADDING;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING - 2*text_surface->h;
+    text_pos.x = display_width - text_surface->w - X_PADDING;
+    text_pos.y = display_height - Y_PADDING - 2*text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
     text_surface = TTF_RenderText_Shaded(font_info, "R=RESTART", green_color, bg_color);
-    text_pos.x = SCREEN_HORIZONTAL_SIZE - text_surface->w - X_PADDING/2;
-    text_pos.y = SCREEN_VERTICAL_SIZE - Y_PADDING - text_surface->h;
+    text_pos.x = display_width - text_surface->w - X_PADDING/2;
+    text_pos.y = display_height - Y_PADDING - text_surface->h;
     SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
     SDL_FreeSurface(text_surface);
 

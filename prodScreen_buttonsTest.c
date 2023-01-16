@@ -64,7 +64,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
 
             /* Write Title */
             text_surface = TTF_RenderText_Shaded(font_title, prog_title, text_color, bg_color);
-            text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
+            text_pos.x = display_width/2 - text_surface->w/2;
             text_pos.y = Y_PADDING;
             SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
             SDL_FreeSurface(text_surface);
@@ -72,7 +72,7 @@ int launch_prod_screen_buttons(int argc, char *argv[]){
             /* Write "Screen ok ? */
             sprintf(str_title_buttons, "Press all buttons...%ds", time_left);
             text_surface = TTF_RenderText_Shaded(font_info, str_title_buttons, text_color, bg_color);
-            text_pos.x = SCREEN_HORIZONTAL_SIZE/2 - text_surface->w/2;
+            text_pos.x = display_width/2 - text_surface->w/2;
             text_pos.y = 2*Y_PADDING + text_surface->h/2;
             SDL_BlitSurface(text_surface, NULL, hw_surface, &text_pos);
             SDL_FreeSurface(text_surface);

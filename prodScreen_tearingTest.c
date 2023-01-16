@@ -48,9 +48,9 @@ static int wait_event_loop(uint32_t fps){
         }
 
         /* Fill screen random */
-        SDL_Color current_color = {rand() % 256 + 128*bright, 
-                                rand() % 256 + 128*bright, 
-                                rand() % 256 + 128*bright};
+        SDL_Color current_color = {rand() % 127 + 128*bright, 
+                                rand() % 127 + 128*bright, 
+                                rand() % 127 + 128*bright};
         SDL_FillRect(hw_surface, NULL, SDL_MapRGBA(hw_surface->format, 
             current_color.r, current_color.g, current_color.b, 0) );
         bright = 1-bright;
@@ -73,10 +73,8 @@ static int wait_event_loop(uint32_t fps){
 }
 
 int launch_prod_screen_tearingtest(int argc, char *argv[]){
-    SDL_Surface *text_surface = NULL;
-    SDL_Rect text_pos;
-
     int fps = 0; // non stop
+
     if(argc > 0 && argv[0] != NULL){
         fps = atoi(argv[0]);
         if(!fps){
